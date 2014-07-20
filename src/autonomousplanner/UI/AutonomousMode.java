@@ -3,6 +3,7 @@ package autonomousplanner.UI;
 import autonomousplanner.Util;
 import autonomousplanner.geometry.Line;
 import autonomousplanner.geometry.Point;
+import autonomousplanner.geometry.Quintic;
 import autonomousplanner.geometry.Segment;
 import autonomousplanner.geometry.Spline;
 import java.awt.Graphics;
@@ -16,7 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
 
 /**
- * The spline editor window
+ * An auto mode and its spline editor window
  *
  * @author Jared
  */
@@ -29,10 +30,11 @@ public class AutonomousMode extends TimerTask {
     boolean isDragging;
     ArrayList<Spline> splines = new ArrayList<Spline>();
     double startX, startY, startH;
-    
+
     int LOW_RES = 100;
+
     /**
-     * Make new editor.
+     * Make new auto mode.
      *
      * @param x start x value
      * @param y start y value
@@ -53,7 +55,7 @@ public class AutonomousMode extends TimerTask {
         jf.getContentPane().add(display);
         jf.setVisible(true);
         timer.scheduleAtFixedRate(this, 0, 20);
-        
+
     }
 
     /**
@@ -63,8 +65,10 @@ public class AutonomousMode extends TimerTask {
     public void run() {
         display.repaint();
     }
-
-    final class Editor extends JComponent implements MouseInputListener {
+    /**
+     * The editor to go with an auto mode.
+     */
+    public class Editor extends JComponent implements MouseInputListener {
 
         //THIS VALUE FOR RESOLUTION!!!
         int pointMover;
@@ -79,13 +83,16 @@ public class AutonomousMode extends TimerTask {
             addMouseListener(this); //leaking this in constructor.  I don't care.
             addMouseMotionListener(this);
             Point s = new Point(0, 0);
-            s.x = startX*20 + 250;
-            s.y = startY*20 + 250;
+            s.x = startX * 20 + 250;
+            s.y = startY * 20 + 250;
             s.h = startH;
-            System.out.println(startX + " " + startY);
             waypoints.add(s);
         }
 
+        /**
+         * Draw the graphics to the screen
+         * @param g
+         */
         @Override
         public void paintComponent(Graphics g) {
             //origin
@@ -98,8 +105,10 @@ public class AutonomousMode extends TimerTask {
                     waypointInFocus.x, waypointInFocus.y, 10, g);
             drawSplines(g, splines);
         }
+
         /**
          * Draw some waypoints.
+         *
          * @param g graphics
          * @param waypoints points to draw
          */
@@ -109,20 +118,22 @@ public class AutonomousMode extends TimerTask {
                         waypoints.get(i).x, waypoints.get(i).y, 7, g);
             }
         }
+
         /**
-         * Draw some splines
+         * Draw some splines.
+         * Uses a bunch of tiny lines
          * @param g graphics
          * @param splines splines to draw
          */
-        public void drawSplines(Graphics g, ArrayList<Spline> splines){
-            for(int i = 0; i < splines.size(); i++){
+        public void drawSplines(Graphics g, ArrayList<Spline> splines) {
+            for (int i = 0; i < splines.size(); i++) {
                 Spline sp = splines.get(i);
-                
-                for(int j = 1; j < sp.getSegments().s.size()- 1; j++){
+
+                for (int j = 1; j < sp.getSegments().s.size() - 1; j++) {
                     //look ahead line draw
-                    Segment s1 = sp.getSegments().s.get(j-1);
+                    Segment s1 = sp.getSegments().s.get(j - 1);
                     Segment s2 = sp.getSegments().s.get(j);
-                    g.drawLine((int)s1.x, (int)s1.y, (int)s2.x, (int)s2.y);
+                    g.drawLine((int) s1.x, (int) s1.y, (int) s2.x, (int) s2.y);
                 }
             }
         }
@@ -196,6 +207,8 @@ public class AutonomousMode extends TimerTask {
             if (isDragging) {
                 if (pointMover < 6) {
                     waypoints.get(pointMover).move(me.getX(), me.getY());
+                    waypointInFocus.x = me.getX();
+                    waypointInFocus.y = me.getY();
                     repaint();
                 }
             }
@@ -218,15 +231,20 @@ public class AutonomousMode extends TimerTask {
         public void addSegment(String type, double x, double y) {
             waypoints.add(new Point(x, y));
             if ("Line".equals(type)) {
-                int i = waypoints.size()-1;
-                Line line = new Line(waypoints.get(i-1).x, x,
-                        waypoints.get(i-1).y, y, waypoints.get(i-1).h, 0);
+                int i = waypoints.size() - 1;
+                Line line = new Line(waypoints.get(i - 1).x, x,
+                        waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
                 line.calculateSegments(LOW_RES);
                 splines.add(line);
-                
+
             } else if ("Cubic".equals(type)) {
 
             } else if ("Quintic".equals(type)) {
+                int i = waypoints.size() - 1;
+                Quintic q = new Quintic(waypoints.get(i - 1).x, x,
+                        waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
+                splines.add(q);
+                recalculateAllSplines(splines);
 
             }
         }
@@ -243,22 +261,24 @@ public class AutonomousMode extends TimerTask {
                 double yNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "Y Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                 waypoints.set((int) waypointInFocus.h, coordinateTransform(new Point(250 + xNew, 250 + yNew)));
             }
+            recalculateAllSplines(splines);
         }
+
         /**
          * If splines exist, recalculate.
-         * @param splines 
+         *
+         * @param splines
          */
-        public void recalculateAllSplines(ArrayList<Spline> splines){
-            if(splines.size() > 0){
-                for(int i = 0; i < splines.size(); i++){
-                splines.get(i).setEndPoint(
-                        waypoints.get(i).x, waypoints.get(i).y);
-                splines.get(i).setStartPoint(
-                        waypoints.get(i+1).x, waypoints.get(i+1).y);
-                splines.get(i).calculateSegments(LOW_RES);
+        public void recalculateAllSplines(ArrayList<Spline> splines) {
+            if (splines.size() > 0) {
+                for (int i = 0; i < splines.size(); i++) {
+                    
+                    splines.get(i).setExtremePoints(waypoints.get(i + 1).x, waypoints.get(i + 1).y, 
+                            waypoints.get(i).x, waypoints.get(i).y);
+                    splines.get(i).calculateSegments(LOW_RES);
+                }
             }
-            }
-            
+
         }
     }
 

@@ -24,7 +24,6 @@ public class SegmentGroup {
     @Override
     public String toString(){
         String str = "";
-        System.out.println(s.size());
         for(int i = 0; i < s.size(); i+=1){
             //str = str + s.get(i).toString() + '\n';
             Segment a = s.get(i);

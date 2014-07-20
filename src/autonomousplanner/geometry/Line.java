@@ -29,7 +29,6 @@ public class Line implements Spline {
         this.y2 = y2;
         this.h1 = h1;
         this.h2 = h2;
-        System.out.println(x1 + " " + x2 + " " + y1 + " " + y2);
     }
 
     /**
@@ -38,11 +37,9 @@ public class Line implements Spline {
      * @param x
      * @param y
      */
-    @Override
     public void setStartPoint(double x, double y) {
         x1 = x;
         y1 = y;
-        System.out.println(x + " " + y);
     }
 
     /**
@@ -51,11 +48,9 @@ public class Line implements Spline {
      * @param x
      * @param y
      */
-    @Override
     public void setEndPoint(double x, double y) {
         x2 = x;
         y2 = y;
-        System.out.println(x + " " + y);
     }
 
     /**
@@ -101,6 +96,12 @@ public class Line implements Spline {
     @Override
     public int length() {
         return length;
+    }
+
+    @Override
+    public void setExtremePoints(double x0, double y0, double x1, double y1) {
+        setStartPoint(x0, y0);
+        setEndPoint(x1, y1);
     }
 
 }

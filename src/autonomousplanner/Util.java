@@ -33,7 +33,6 @@ public class Util {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            System.out.println(sw.toString());
             JOptionPane.showMessageDialog(null, new TextArea(sw.toString()),
                     "Number Error", 3);
         }
@@ -50,7 +49,11 @@ public class Util {
         return JOptionPane.showInputDialog(
                 null, message, title, JOptionPane.PLAIN_MESSAGE);
     }
-    
+    /**
+     * Display an error message.
+     * @param message The message
+     * @param title Title of the window.
+     */
     public static void displayMessage(String message, String title){
         JOptionPane.showMessageDialog(null, message, title, 2);
     }

@@ -7,8 +7,7 @@ package autonomousplanner.geometry;
  * @author Jared
  */
 public interface Spline {
-    public void setStartPoint(double x, double y);
-    public void setEndPoint(double x, double y);
+    public void setExtremePoints(double x0, double y0, double x1, double y1);
     public SegmentGroup getSegments();
     public void calculateSegments(int resolution);
     int length();
