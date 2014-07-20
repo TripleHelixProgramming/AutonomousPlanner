@@ -16,26 +16,18 @@ import java.util.ArrayList;
  * - 15*t*t*t*t + 6*t*t*t*t*t
  *
  * @author Team 236
- * 
- * Note: Can decrease memory usage.  Do all calculations with one set of data.
+ *
+ * Note: Can decrease memory usage. Do all calculations with one set of data.
  */
 public class Quintic implements Spline {
 
     double p0, q0, r0, p1, q1, r1;
+    int index = 0;
     double xChange, d_x;
     int distancep = 100;
-    Point[] points = new Point[distancep];
     SegmentGroup sg = new SegmentGroup();
-
-    /**
-     * xValues of all data points.
-     */
-    public ArrayList<Double> xList = new ArrayList<>();
-
-    /**
-     * yValues of all data points.
-     */
-    public ArrayList<Double> yList = new ArrayList<>();
+    ArrayList<Double> xList = new ArrayList<>();
+    ArrayList<Double> yList = new ArrayList<>();
 
     /**
      * Creates a relaxed Spline with these parameters. This is not a parametric
@@ -135,26 +127,33 @@ public class Quintic implements Spline {
      */
     public void getScaledPoints() {
         //go from 1 to 1000 little tiny steps.
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < distancep; i++) {
             //add each point to sequence.
-            points[i] = new Point((double) i / distancep, evaluateSpline((double) i / distancep));
             double j = (double) i / distancep;
             xList.add((j * d_x) + xChange);
-            yList.add((double) evaluateSpline((double) i / distancep) * d_x);
+            yList.add(evaluateSpline((double) i / distancep) * d_x);
         }
     }
-
+    /**
+     * Get all the segments!
+     * @return 
+     */
     @Override
     public SegmentGroup getSegments() {
         return sg;
     }
 
+    /**
+     * Calculate segments.
+     * @param resolution
+     */
     @Override
     public void calculateSegments(int resolution) {
         getScaledPoints();
         sg.s.clear();
-        
-        for(int i = 0; i < xList.size(); i++){
+        distancep = resolution;
+
+        for (int i = 0; i < xList.size(); i++) {
             Segment s = new Segment();
             s.x = xList.get(i);
             s.y = yList.get(i);
@@ -162,20 +161,41 @@ public class Quintic implements Spline {
         }
         xList.clear();
         yList.clear();
-        
+
     }
 
+    /**
+     * Length of spline in segments.
+     * @return Number of segments.
+     */
     @Override
     public int length() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Set new extreme values for spline.
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     */
     @Override
     public void setExtremePoints(double x0, double y0, double x1, double y1) {
         sg.s.clear();
         xList.clear();
         yList.clear();
         editSpline(x0, y0, 0, x1, y1, 0);
+    }
+    
+     @Override
+    public void setStartingWaypointIndex(int i) {
+        index = i;
+    }
+
+    @Override
+    public int getWaypointIndex() {
+        return index;
     }
 
 }

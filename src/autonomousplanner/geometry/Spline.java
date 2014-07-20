@@ -11,4 +11,6 @@ public interface Spline {
     public SegmentGroup getSegments();
     public void calculateSegments(int resolution);
     int length();
+    public void setStartingWaypointIndex(int i);
+    public int getWaypointIndex();
 }

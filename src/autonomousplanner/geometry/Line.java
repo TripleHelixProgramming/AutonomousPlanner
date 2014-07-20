@@ -8,6 +8,7 @@ package autonomousplanner.geometry;
 public class Line implements Spline {
 
     double x1, x2, y1, y2, h1, h2;
+    int index = 0;
     int length = 0;
     SegmentGroup sg = new SegmentGroup();
 
@@ -93,15 +94,36 @@ public class Line implements Spline {
         }
     }
 
+    /**
+     * Length of spline in segments
+     * @return number of segments
+     */
     @Override
     public int length() {
         return length;
     }
 
+    /**
+     * Set new extreme values for the spline.
+     * @param x0
+     * @param y0
+     * @param x1
+     * @param y1
+     */
     @Override
     public void setExtremePoints(double x0, double y0, double x1, double y1) {
         setStartPoint(x0, y0);
         setEndPoint(x1, y1);
+    }
+
+    @Override
+    public void setStartingWaypointIndex(int i) {
+        index = i;
+    }
+
+    @Override
+    public int getWaypointIndex() {
+        return index;
     }
 
 }
