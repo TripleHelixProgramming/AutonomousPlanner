@@ -13,4 +13,14 @@ public interface Spline {
     int length();
     public void setStartingWaypointIndex(int i);
     public int getWaypointIndex();
+    public double startDYDX();
+    public double endDYDX();
+    public void setStartDYDX(double dydx);
+    public void setEndDYDX(double dydx);
+    public boolean isContinuousAtEnd();
+    public boolean isContinuousAtBeginning();
+    public boolean leftEndIsAbsoluteEnd();
+    public boolean rightEngIsAbsoluteEnd();
+    public void setLeftEndAbsolute(boolean isAbsolute);
+    public void setRightEndAbsolute(boolean isAbsolute);
 }

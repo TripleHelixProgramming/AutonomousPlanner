@@ -20,7 +20,7 @@ import java.util.ArrayList;
  * Note: Can decrease memory usage. Do all calculations with one set of data.
  */
 public class Quintic implements Spline {
-
+    boolean leftAbsEnd, rightAbsEnd;
     double p0, q0, r0, p1, q1, r1;
     int index = 0;
     double xChange, d_x;
@@ -196,6 +196,99 @@ public class Quintic implements Spline {
     @Override
     public int getWaypointIndex() {
         return index;
+    }
+    
+     /**
+     * Get the slope at the first point.
+     * @return
+     */
+    @Override
+    public double startDYDX() {
+        return q0;
+    }
+
+    /**
+     * Get the slope at the last point.
+     * @return
+     */
+    @Override
+    public double endDYDX() {
+        return q1;
+    }
+
+    /**
+     * Set the slope at the first point.
+     * @param dydx
+     */
+    @Override
+    public void setStartDYDX(double dydx) {
+        q0 = dydx;
+    }
+
+    /**
+     * Set the slope at the last point.
+     * @param dydx
+     */
+    @Override
+    public void setEndDYDX(double dydx) {
+        q1 = dydx;
+    }
+
+    /**
+     * Is it 1st/2nd derivative continuous at the end?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtEnd() {
+        return true;
+    }
+    /**
+     * Is it 1st/2nd derivative continuous at the beginning?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtBeginning() {
+        return true;
+    }
+
+    /**
+     * Is the left end the absolute end?.
+     * Left means first point, not leftmost.
+     * @return
+     */
+    @Override
+    public boolean leftEndIsAbsoluteEnd() {
+        return leftAbsEnd;
+    }
+
+    /**
+     * Is the right end the absolute end?.
+     * Right means last, not rightmost.
+     * @return
+     */
+    @Override
+    public boolean rightEngIsAbsoluteEnd() {
+        return rightAbsEnd;
+    }
+
+    /**
+     * Set first point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setLeftEndAbsolute(boolean isAbsolute) {
+        leftAbsEnd = isAbsolute;
+    }
+
+    /**
+     * Set last point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setRightEndAbsolute(boolean isAbsolute) {
+        rightAbsEnd = isAbsolute;
     }
 
 }

@@ -6,11 +6,14 @@ package autonomousplanner.geometry;
  * @author Jared
  */
 public class Line implements Spline {
-
+    boolean leftAbsEnd, rightAbsEnd;
     double x1, x2, y1, y2, h1, h2;
     int index = 0;
     int length = 0;
     SegmentGroup sg = new SegmentGroup();
+    double dydx;
+    boolean isContinousAtEnd = true;
+    boolean isContinousAtStart = true;
 
     /**
      * Makes a new line with these points. In the future, the heading can be
@@ -76,7 +79,7 @@ public class Line implements Spline {
         double dy = y2 - y1;
         double dx = x2 - x1;
         //now dy/dx
-        double dydx = dy / dx;
+        dydx = dy / dx;
         //y1 = dydx (x1) + b
         //y1-(dydx*x1) = b
         double b = y2 - (dydx * x2);
@@ -116,14 +119,116 @@ public class Line implements Spline {
         setEndPoint(x1, y1);
     }
 
+    /**
+     * Set the index of the starting waypoint segment for drawing.
+     * @param i
+     */
     @Override
     public void setStartingWaypointIndex(int i) {
         index = i;
     }
 
+    /**
+     * Get the index of the starting waypoint segment index.
+     * @return
+     */
     @Override
     public int getWaypointIndex() {
         return index;
+    }
+
+    /**
+     * Get the slope at the first point.
+     * @return
+     */
+    @Override
+    public double startDYDX() {
+        return dydx;
+    }
+
+    /**
+     * Get the slope at the last point.
+     * @return
+     */
+    @Override
+    public double endDYDX() {
+        return dydx;
+    }
+
+    /**
+     * Set the slope at the first point.
+     * @param dydx
+     */
+    @Override
+    public void setStartDYDX(double dydx) {
+        isContinousAtStart = false;
+    }
+
+    /**
+     * Set the slope at the last point.
+     * @param dydx
+     */
+    @Override
+    public void setEndDYDX(double dydx) {
+        isContinousAtEnd = false;
+        
+    }
+    
+    /**
+     * Is it 1st/2nd derivative continuous at the end?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtEnd() {
+        return true;
+    }
+    /**
+     * Is it 1st/2nd derivative continuous at the beginning?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtBeginning() {
+        return true;
+    }
+
+    /**
+     * Is the left end the absolute end?.
+     * Left means first point, not leftmost.
+     * @return
+     */
+    @Override
+    public boolean leftEndIsAbsoluteEnd() {
+        return leftAbsEnd;
+    }
+
+    /**
+     * Is the right end the absolute end?.
+     * Right means last, not rightmost.
+     * @return
+     */
+    @Override
+    public boolean rightEngIsAbsoluteEnd() {
+        return rightAbsEnd;
+    }
+
+    /**
+     * Set first point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setLeftEndAbsolute(boolean isAbsolute) {
+        leftAbsEnd = isAbsolute;
+    }
+
+    /**
+     * Set last point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setRightEndAbsolute(boolean isAbsolute) {
+        rightAbsEnd = isAbsolute;
     }
 
 }

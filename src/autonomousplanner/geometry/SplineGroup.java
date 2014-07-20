@@ -11,4 +11,6 @@ public interface SplineGroup {
     public SegmentGroup getSegments();
     public int getStartingIndex();
     public void setStartingIndex(int i);
+    public double getStartDYDX();
+    public double getEndDYDX();
 }

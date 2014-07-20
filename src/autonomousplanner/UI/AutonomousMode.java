@@ -179,7 +179,7 @@ public class AutonomousMode extends TimerTask {
                     if (me.getButton() == 3) {
                         //right clicked near point i.
                         //go through input box steps
-                        double xNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "X Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
+                        double xNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, waypoints.get(i).h, Integer.toString(i), JOptionPane.PLAIN_MESSAGE));
                         double yNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "Y Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                         waypoints.set(i, coordinateTransform(new Point(250 + xNew, 250 + yNew)));
                     } else {
@@ -249,8 +249,9 @@ public class AutonomousMode extends TimerTask {
          * @param p
          */
         public void addSegment(String type, double x, double y) {
-            waypoints.add(new Point(x, y));
+            
             if ("Line".equals(type)) {
+                waypoints.add(new Point(x, y));
                 int i = waypoints.size() - 1;
                 Line line = new Line(waypoints.get(i - 1).x, x,
                         waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
@@ -259,17 +260,20 @@ public class AutonomousMode extends TimerTask {
                 splines.add(line);
 
             } else if ("Piecewise Cubic".equals(type)) {
+                
                 //placeholder test
                 //add six new waypoints.
 
                 Cubic c = new Cubic();
-                c.setStartingIndex(waypoints.size()-2);
-                Point p = waypoints.get(waypoints.size() - 2);
+                c.setStartingIndex(waypoints.size()-1);
+                Point p = waypoints.get(waypoints.size() - 1);
                 addCubicWaypoints(p.x, p.y, lastClicked.x, lastClicked.y, waypoints);
+                waypoints.add(new Point(x, y));
                 sGroups.add(c);
                 recalculateAllSplines(splines, sGroups);
 
             } else if ("Quintic".equals(type)) {
+                waypoints.add(new Point(x, y));
                 int i = waypoints.size() - 1;
                 Quintic q = new Quintic(waypoints.get(i - 1).x, x,
                         waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
@@ -293,11 +297,11 @@ public class AutonomousMode extends TimerTask {
                 double y1, ArrayList<Point> s) {
             double dx = x1 - x0;
             double dy = y1 - y0;
-            waypoints.add(new Point(x0, y0));
-            System.out.println(x0 +" " + y0 + " " + x1 + " " + y1);
-            for (int i = 1; i < 4; i++) {
-                waypoints.add(new Point(i*(dx/4) + x0, i*(dy/4) + y0));
+            //waypoints.add(new Point(x0, y0));
+            for (int i = 1; i < 5; i++) {
+                waypoints.add(new Point(i*(dx/5) + x0, i*(dy/5) + y0));
             }
+            
             //waypoints.add(new Point(x1, y1));
         }
 
@@ -318,8 +322,9 @@ public class AutonomousMode extends TimerTask {
 
         /**
          * If splines exist, recalculate.
-         *
+         * This is a small disaster.
          * @param splines
+         * @param sGroups
          */
         public void recalculateAllSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups) {
             //do groups first
@@ -328,11 +333,16 @@ public class AutonomousMode extends TimerTask {
                     int startPoint = sGroups.get(i).getStartingIndex();
                     for (int j = 0; j < 6; j++) {
                         sGroups.get(i).setPoint(
-                                (int)waypoints.get(startPoint + j).x, 
-                                (int)waypoints.get(startPoint+j).y, j);
+                                (int)waypoints.get(startPoint + j ).x, 
+                                (int)waypoints.get(startPoint+j ).y, j);
                         //System.out.println(waypoints.get(waypoints.size()-1).x);
                     }
+                    //set slopes.
                     sGroups.get(i).calculateSpline();
+                    
+                    waypoints.get(startPoint).h = sGroups.get(i).getStartDYDX();
+                    waypoints.get(startPoint+5).h = sGroups.get(i).getEndDYDX();
+                    
                 }
             }
             if (splines.size() > 0) {
@@ -344,8 +354,16 @@ public class AutonomousMode extends TimerTask {
                     y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
                     y1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).y;
                     splines.get(i).setExtremePoints(x0, y0, x1, y1);
-
                     splines.get(i).calculateSegments(LOW_RES);
+                    //do some slopes.
+                    double dydx0 = waypoints.get(splines.get(i).getWaypointIndex()-1).h;
+                    double dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).h;
+                    splines.get(i).setStartDYDX(dydx1);
+                    splines.get(i).setEndDYDX(dydx0);
+                    splines.get(i).calculateSegments(LOW_RES);
+                    waypoints.get(splines.get(i).getWaypointIndex()-1).h = splines.get(i).endDYDX();
+                    waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();
+                    
                 }
             }
 

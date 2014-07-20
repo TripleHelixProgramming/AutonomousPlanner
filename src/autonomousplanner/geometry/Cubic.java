@@ -131,7 +131,10 @@ public class Cubic implements SplineGroup {
 
     }
 
-    public void makeBezierLists() {
+    /**
+     * The second part of calculations
+     */
+    public void makeLists() {
         double x1, y1, x2, y2;
         //x1 = interp[0].x;
         //y1 = interp[0].y;
@@ -168,6 +171,12 @@ public class Cubic implements SplineGroup {
         }
     }
 
+    /**
+     * Set a control point
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param i index (0-5)
+     */
     @Override
     public void setPoint(int x, int y, int i) {
         try {
@@ -178,11 +187,14 @@ public class Cubic implements SplineGroup {
         }
     }
 
+    /**
+     * Do spline calculations and dump into segment group
+     */
     @Override
     public void calculateSpline() {
         sg = new SegmentGroup();
         generatePoly();
-        makeBezierLists();
+        makeLists();
         for (int i = 0; i < bxList.size(); i++) {
             Segment s = new Segment();
             s.x = bxList.get(i);
@@ -194,19 +206,54 @@ public class Cubic implements SplineGroup {
 
     }
 
+    /**
+     * Get the segment group.
+     * Needs to be calculated first.
+     * @return
+     */
     @Override
     public SegmentGroup getSegments() {
         return sg;
     }
     
-     @Override
+    /**
+     * Set waypoint index of starting segment.
+     * @param i
+     */
+    @Override
     public void setStartingIndex(int i) {
         index = i;
     }
 
+    /**
+     * Get waypoint index of starting segment
+     * @return
+     */
     @Override
     public int getStartingIndex() {
         return index;
+    }
+
+    /**
+     * Get starting slope.
+     * @return
+     */
+    @Override
+    public double getStartDYDX() {
+        double dy = s2.y - s1.y;
+        double dx = s2.x - s1.x;
+        return dy/dx;
+    }
+
+    /**
+     * Get ending slope.
+     * @return
+     */
+    @Override
+    public double getEndDYDX() {
+        double dy = s4.y - s3.y;
+        double dx = s4.x - s3.x;
+        return dy/dx;
     }
 
 }
