@@ -129,7 +129,7 @@ public class StartWindow extends javax.swing.JFrame {
         Double x = Util.messageBoxDouble("Starting x value", "New Auto");
         Double y = Util.messageBoxDouble("Starting y value", "New Auto");
         Double h = Util.messageBoxDouble("Starting heading", "New Auto");
-        Editor editor = new Editor(x, y, h, name);
+        AutonomousMode editor = new AutonomousMode(x, y, h, name);
         Toolbox tb = new Toolbox(editor);
         tb.openWindow();
 

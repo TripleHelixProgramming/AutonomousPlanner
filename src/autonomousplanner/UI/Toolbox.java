@@ -9,11 +9,11 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author Jared
  */
 public class Toolbox extends javax.swing.JFrame {
-    Editor editor;
+    AutonomousMode editor;
     /**
      * Creates new form AddSplineSegment
      */
-    public Toolbox(Editor editor) {
+    public Toolbox(AutonomousMode editor) {
         initComponents();
         this.editor = editor;
     }
