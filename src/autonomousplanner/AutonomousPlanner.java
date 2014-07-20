@@ -1,10 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package autonomousplanner;
+
+import autonomousplanner.UI.StartWindow;
 
 /**
  * Main Class for the Autonomous Planner
@@ -16,7 +13,8 @@ public class AutonomousPlanner {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        //create the one and only start window
+        StartWindow.main(args);
     }
     
 }
