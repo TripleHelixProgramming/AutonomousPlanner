@@ -23,4 +23,7 @@ public interface Spline {
     public boolean rightEngIsAbsoluteEnd();
     public void setLeftEndAbsolute(boolean isAbsolute);
     public void setRightEndAbsolute(boolean isAbsolute);
+    public String getType();
+    public int splineID();
+    public void setSplineID(int id);
 }

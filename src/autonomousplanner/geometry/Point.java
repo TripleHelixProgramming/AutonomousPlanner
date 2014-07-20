@@ -20,7 +20,8 @@ public class Point {
     /**
      * y point.
      */
-    y, h;
+    y, h, quinticOverride;
+    boolean canRotate;
 
     /**
      * Make a new point!
@@ -31,6 +32,13 @@ public class Point {
         this.x = x;
         this.y = y;
     }
+    
+    public Point(double x, double y, double h){
+        this.x = x;
+        this.y = y;
+        this.h = h;
+    }
+    
 
     /**
      * Get the x value of the point!
@@ -127,6 +135,14 @@ public class Point {
     
     public String toString(){
         return "X: " + x + " Y: " + y;
+    }
+    
+    public void setRotate(boolean rotate){
+        canRotate = rotate;
+    }
+    
+    public boolean getRotate(){
+        return canRotate;
     }
 
 }

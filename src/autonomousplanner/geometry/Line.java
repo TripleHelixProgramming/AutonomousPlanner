@@ -14,6 +14,7 @@ public class Line implements Spline {
     double dydx;
     boolean isContinousAtEnd = true;
     boolean isContinousAtStart = true;
+    int ID=0;
 
     /**
      * Makes a new line with these points. In the future, the heading can be
@@ -181,7 +182,7 @@ public class Line implements Spline {
      */
     @Override
     public boolean isContinuousAtEnd() {
-        return true;
+        return false;
     }
     /**
      * Is it 1st/2nd derivative continuous at the beginning?.
@@ -190,7 +191,7 @@ public class Line implements Spline {
      */
     @Override
     public boolean isContinuousAtBeginning() {
-        return true;
+        return false;
     }
 
     /**
@@ -229,6 +230,25 @@ public class Line implements Spline {
     @Override
     public void setRightEndAbsolute(boolean isAbsolute) {
         rightAbsEnd = isAbsolute;
+    }
+    
+    /**
+     * The type of spline.
+     * @return
+     */
+    @Override
+    public String getType(){
+        return "Line";
+    }
+
+    @Override
+    public int splineID() {
+        return ID;
+    }
+
+    @Override
+    public void setSplineID(int id) {
+        this.ID = id;
     }
 
 }

@@ -25,6 +25,7 @@ public class Quintic implements Spline {
     int index = 0;
     double xChange, d_x;
     int distancep = 100;
+    int ID = 0;
     SegmentGroup sg = new SegmentGroup();
     ArrayList<Double> xList = new ArrayList<>();
     ArrayList<Double> yList = new ArrayList<>();
@@ -289,6 +290,24 @@ public class Quintic implements Spline {
     @Override
     public void setRightEndAbsolute(boolean isAbsolute) {
         rightAbsEnd = isAbsolute;
+    }
+    /**
+     * The type of spline.
+     * @return
+     */
+    @Override
+    public String getType(){
+        return "Quintic";
+    }
+    
+    @Override
+    public int splineID() {
+        return ID;
+    }
+
+    @Override
+    public void setSplineID(int id) {
+        this.ID = id;
     }
 
 }

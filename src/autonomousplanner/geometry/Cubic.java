@@ -8,6 +8,7 @@ import java.util.ArrayList;
  * @author Jared
  */
 public class Cubic implements SplineGroup {
+    boolean leftAbsEnd, rightAbsEnd;
 
     SegmentGroup sg = new SegmentGroup();
     int index = 0;
@@ -22,6 +23,7 @@ public class Cubic implements SplineGroup {
     //path starts and ends.
     double xStart, yStart, hStart;
     double xEnd, yEnd, hEnd;
+    int ID = 0;
 
     Point[] interp = new Point[6]; //always have six, that's as big as
     //the polynomials go.
@@ -255,5 +257,73 @@ public class Cubic implements SplineGroup {
         double dx = s4.x - s3.x;
         return dy/dx;
     }
+    
+      /**
+     * Is it 1st/2nd derivative continuous at the end?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtEnd() {
+        return false;
+    }
+    /**
+     * Is it 1st/2nd derivative continuous at the beginning?.
+     * True if endpoint.
+     * @return 
+     */
+    @Override
+    public boolean isContinuousAtBeginning() {
+        return false;
+    }
+
+    /**
+     * Is the left end the absolute end?.
+     * Left means first point, not leftmost.
+     * @return
+     */
+    @Override
+    public boolean leftEndIsAbsoluteEnd() {
+        return leftAbsEnd;
+    }
+
+    /**
+     * Is the right end the absolute end?.
+     * Right means last, not rightmost.
+     * @return
+     */
+    @Override
+    public boolean rightEngIsAbsoluteEnd() {
+        return rightAbsEnd;
+    }
+
+    /**
+     * Set first point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setLeftEndAbsolute(boolean isAbsolute) {
+        leftAbsEnd = isAbsolute;
+    }
+
+    /**
+     * Set last point sequence start.
+     * @param isAbsolute
+     */
+    @Override
+    public void setRightEndAbsolute(boolean isAbsolute) {
+        rightAbsEnd = isAbsolute;
+    }
+    
+    @Override
+    public int splineID() {
+        return ID;
+    }
+
+    @Override
+    public void setSplineID(int id) {
+        this.ID = id;
+    }
+
 
 }

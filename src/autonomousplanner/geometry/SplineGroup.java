@@ -13,4 +13,12 @@ public interface SplineGroup {
     public void setStartingIndex(int i);
     public double getStartDYDX();
     public double getEndDYDX();
+    public boolean isContinuousAtEnd();
+    public boolean isContinuousAtBeginning();
+    public boolean leftEndIsAbsoluteEnd();
+    public boolean rightEngIsAbsoluteEnd();
+    public void setLeftEndAbsolute(boolean isAbsolute);
+    public void setRightEndAbsolute(boolean isAbsolute);
+    public int splineID();
+    public void setSplineID(int id);
 }

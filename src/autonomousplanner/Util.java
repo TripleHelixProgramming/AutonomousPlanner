@@ -6,6 +6,7 @@
 
 package autonomousplanner;
 
+import autonomousplanner.geometry.Point;
 import java.awt.TextArea;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -56,6 +57,39 @@ public class Util {
      */
     public static void displayMessage(String message, String title){
         JOptionPane.showMessageDialog(null, message, title, 2);
+    }
+    
+     /**
+     * Return slope between the two points.
+     * @param a
+     * @param b
+     * @return
+     */
+    public static double slope(Point a, Point b){
+        double dy = a.y - b.y;
+        double dx = a.x - b.x;
+        return dy/dx;
+    }
+    
+
+    
+    /**
+     * Slope to radian.  It's atan2.
+     * @param x
+     * @param y
+     * @return
+     */
+    public static double slopeToRadians(double x, double y){
+        return Math.atan2(y, x);
+    }
+    
+    /**
+     * Angle to slope.  It's tangent(theta).
+     * @param theta
+     * @return
+     */
+    public static double angleToSlope(double theta){
+        return Math.tan(theta);
     }
     
 }
