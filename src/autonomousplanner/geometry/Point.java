@@ -22,6 +22,7 @@ public class Point {
      */
     y, h, quinticOverride;
     boolean canRotate;
+    public boolean isOverridden = false;
 
     /**
      * Make a new point!

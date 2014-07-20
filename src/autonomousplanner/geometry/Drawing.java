@@ -1,4 +1,4 @@
-package autonomousplanner.UI;
+package autonomousplanner.geometry;
 
 import java.awt.Color;
 import java.awt.Graphics;

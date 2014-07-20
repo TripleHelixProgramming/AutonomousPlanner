@@ -1,15 +1,17 @@
 package autonomousplanner.UI;
 
-import autonomousplanner.geometry.Point;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
+import autonomousplanner.Path;
+import autonomousplanner.ContinuousPath;
 
 /**
  *
  * @author Jared
  */
 public class Toolbox extends javax.swing.JFrame {
+
     AutonomousMode editor;
+    ContinuousPath bot;
+
     /**
      * Creates new form AddSplineSegment
      */
@@ -37,6 +39,7 @@ public class Toolbox extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
 
         jButton1.setText("jButton1");
 
@@ -57,7 +60,12 @@ public class Toolbox extends javax.swing.JFrame {
 
         jLabel2.setText("Add New Segment at Selected Point");
 
-        jButton3.setText("Delete Segment");
+        jButton3.setText("Override Heading");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Move Point");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -70,6 +78,13 @@ public class Toolbox extends javax.swing.JFrame {
         jButton5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton5ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setText("Save Path");
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
             }
         });
 
@@ -87,6 +102,7 @@ public class Toolbox extends javax.swing.JFrame {
                     .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jButton6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
@@ -113,7 +129,9 @@ public class Toolbox extends javax.swing.JFrame {
                 .addComponent(jButton4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton5)
-                .addContainerGap(49, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton6)
+                .addContainerGap(20, Short.MAX_VALUE))
         );
 
         pack();
@@ -130,6 +148,19 @@ public class Toolbox extends javax.swing.JFrame {
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         finalizePath();        // TODO add your handling code here:
     }//GEN-LAST:event_jButton5ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        editor.display.overrideHeading();        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        // TODO add your handling code here:
+        if (bot != null){
+            new SaveFile(bot).setVisible(true);
+        }else{
+            autonomousplanner.Util.displayMessage("Finalize Path First!", "Error");
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -159,11 +190,10 @@ public class Toolbox extends javax.swing.JFrame {
 //            }
 //        });
 //    }
-    
     /**
      * Opens a new toolbox!
      */
-    public void openWindow(){
+    public void openWindow() {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             @Override
@@ -180,16 +210,18 @@ public class Toolbox extends javax.swing.JFrame {
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     // End of variables declaration//GEN-END:variables
-    void finalizePath(){
-       System.out.println(editor.display.joinSplines());
+    void finalizePath() {
+        Path path = new Path(editor.display.joinSplines());
+
+        bot = new ContinuousPath(path);
+        Player player = new Player(bot);
     }
-
-
 
 }

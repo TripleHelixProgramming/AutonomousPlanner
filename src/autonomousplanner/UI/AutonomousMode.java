@@ -1,5 +1,6 @@
 package autonomousplanner.UI;
 
+import autonomousplanner.geometry.Drawing;
 import autonomousplanner.Util;
 import autonomousplanner.geometry.Cubic;
 import autonomousplanner.geometry.Line;
@@ -31,13 +32,13 @@ public class AutonomousMode extends TimerTask {
     Editor display;
     public JFrame jf;
     boolean isDragging;
-    ArrayList<Spline> splines = new ArrayList<Spline>();
-    ArrayList<SplineGroup> sGroups = new ArrayList<SplineGroup>();
+    ArrayList<Spline> splines = new ArrayList<>();
+    ArrayList<SplineGroup> sGroups = new ArrayList<>();
     double startX, startY, startH;
     int currentID = 0;
 
     int LOW_RES = 100;
-    int HIGH_RES = 100;
+    int HIGH_RES = 10000;
 
     /**
      * Make new auto mode.
@@ -338,6 +339,19 @@ public class AutonomousMode extends TimerTask {
             recalculateAllSplines(splines, sGroups, LOW_RES);
             repaint();
         }
+        
+        void overrideHeading(){
+            
+            if(waypointInFocus.x == -9999){
+                 Util.displayMessage("Click on a waypoint first.", "Error");
+            } else{
+                double h = Double.valueOf(JOptionPane.showInputDialog(null, "Heading Override", "Waypoint", JOptionPane.PLAIN_MESSAGE));
+                double slope = Util.angleToSlope(h);
+                waypoints.get((int)waypointInFocus.h).isOverridden = true;
+                waypoints.get((int)waypointInFocus.h).quinticOverride = slope;
+            }
+            recalculateAllSplines(splines, sGroups, LOW_RES);
+        }
 
         /**
          * If splines exist, recalculate. This is a small disaster.
@@ -359,7 +373,7 @@ public class AutonomousMode extends TimerTask {
                         //System.out.println(waypoints.get(waypoints.size()-1).x);
                     }
                     //set slopes.
-                    sGroups.get(i).calculateSpline();
+                    sGroups.get(i).calculateSpline(1/(double)resolution); //stupid rounding.
 
                     waypoints.get(startPoint).h = sGroups.get(i).getStartDYDX();
                     waypoints.get(startPoint + 5).h = sGroups.get(i).getEndDYDX();
@@ -380,9 +394,15 @@ public class AutonomousMode extends TimerTask {
                     double dydx0 = waypoints.get(splines.get(i).getWaypointIndex() - 1).h;
                     double dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).h;
                     //print(waypoints.get(splines.get(i).getWaypointIndex()).h + " h at "  + splines.get(i).getWaypointIndex());
+                    if(waypoints.get(splines.get(i).getWaypointIndex()).isOverridden){
+                        dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
+                    }
+                    if(waypoints.get(splines.get(i).getWaypointIndex()-1).isOverridden){
+                        dydx0 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
+                    }
                     splines.get(i).setStartDYDX(dydx1);
                     splines.get(i).setEndDYDX(dydx0);
-
+                    
                     splines.get(i).calculateSegments(resolution);
                     waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
                     waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();

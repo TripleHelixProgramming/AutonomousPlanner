@@ -12,6 +12,7 @@ package autonomousplanner.geometry;
  */
 public class Segment {
     public double x, h, y, posit, vel, acc, dydx, d2ydx2, jerk, dt, time, dx;
+    public boolean stopHere = false;
     
     /**
      * A segment.

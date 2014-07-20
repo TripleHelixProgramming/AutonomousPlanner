@@ -193,8 +193,9 @@ public class Cubic implements SplineGroup {
      * Do spline calculations and dump into segment group
      */
     @Override
-    public void calculateSpline() {
+    public void calculateSpline(double stepDistance) {
         sg = new SegmentGroup();
+        disatncep = stepDistance;
         generatePoly();
         makeLists();
         for (int i = 0; i < bxList.size(); i++) {
