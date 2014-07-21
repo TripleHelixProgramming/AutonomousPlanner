@@ -82,7 +82,7 @@ public class ParametricQuintic implements Spline {
         //to make things easier, I'll make dt = 0
         //this means that dy/dt = dy/dx
         //and dx/dt = 1.
-        yt.setStartDYDX(dydx);
+        yt.setStartDYDX(100*dydx);
         xt.setStartDYDX(100);
         
     }
@@ -90,7 +90,7 @@ public class ParametricQuintic implements Spline {
     @Override
     public void setEndDYDX(double dydx) {
         //same as start dydx
-        yt.setEndDYDX(dydx);
+        yt.setEndDYDX(100*dydx);
         xt.setEndDYDX(100);
     }
 

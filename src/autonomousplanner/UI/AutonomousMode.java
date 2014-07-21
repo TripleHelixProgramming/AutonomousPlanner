@@ -198,6 +198,7 @@ public class AutonomousMode extends TimerTask {
                     if (me.getButton() == 3) {
                         //right clicked near point i.
                         //go through input box steps
+                        Util.displayMessage(String.valueOf(waypoints.get(i).h), "WAYPOINT HEADING");
                         double xNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "X Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                         double yNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "Y Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                         if (waypoints.get(i).getRotate()) {
@@ -279,9 +280,10 @@ public class AutonomousMode extends TimerTask {
          */
         public void addSegment(String type, double x, double y) {
 
-            if (null != type) switch (type) {
-                case "Line":{
-                    waypoints.add(new Point(x, y));
+            if (null != type) {
+                switch (type) {
+                    case "Line": {
+                        waypoints.add(new Point(x, y));
                         int i = waypoints.size() - 1;
                         Line line = new Line(waypoints.get(i - 1).x, x,
                                 waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
@@ -292,21 +294,21 @@ public class AutonomousMode extends TimerTask {
                         splines.add(line);
                         break;
                     }
-                case "Piecewise Cubic":
-                    //placeholder test
-                    //add six new waypoints.
-                    Cubic c = new Cubic();
-                    c.setStartingIndex(waypoints.size() - 1);
-                    Point p = waypoints.get(waypoints.size() - 1);
-                    addCubicWaypoints(p.x, p.y, lastClicked.x, lastClicked.y, waypoints);
-                    waypoints.add(new Point(x, y));
-                    c.setSplineID(currentID);
-                    currentID++;
-                    sGroups.add(c);
-                    recalculateAllSplines(splines, sGroups, LOW_RES);
-                    break;
-                case "Quintic":{
-                    waypoints.add(new Point(x, y));
+                    case "Piecewise Cubic":
+                        //placeholder test
+                        //add six new waypoints.
+                        Cubic c = new Cubic();
+                        c.setStartingIndex(waypoints.size() - 1);
+                        Point p = waypoints.get(waypoints.size() - 1);
+                        addCubicWaypoints(p.x, p.y, lastClicked.x, lastClicked.y, waypoints);
+                        waypoints.add(new Point(x, y));
+                        c.setSplineID(currentID);
+                        currentID++;
+                        sGroups.add(c);
+                        recalculateAllSplines(splines, sGroups, LOW_RES);
+                        break;
+                    case "Quintic": {
+                        waypoints.add(new Point(x, y));
                         int i = waypoints.size() - 1;
                         Quintic q = new Quintic(waypoints.get(i - 1).x, x,
                                 waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
@@ -317,8 +319,8 @@ public class AutonomousMode extends TimerTask {
                         recalculateAllSplines(splines, sGroups, LOW_RES);
                         break;
                     }
-                case "Parametric Quintic":{
-                    waypoints.add(new Point(x, y));
+                    case "Parametric Quintic": {
+                        waypoints.add(new Point(x, y));
                         int i = waypoints.size() - 1;
                         ParametricQuintic q = new ParametricQuintic(waypoints.get(i - 1).x, x,
                                 waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
@@ -329,13 +331,13 @@ public class AutonomousMode extends TimerTask {
                         recalculateAllSplines(splines, sGroups, LOW_RES);
                         break;
                     }
+                }
             }
         }
-        
+
 //        public void testMethod(){
 //            Util.makeGraph(splines.get(0).getParametricData(true), "a", "b");
 //        }
-
         /**
          * Adds some cool equidistant points.
          *
@@ -372,16 +374,16 @@ public class AutonomousMode extends TimerTask {
             recalculateAllSplines(splines, sGroups, LOW_RES);
             repaint();
         }
-        
-        void overrideHeading(){
-            
-            if(waypointInFocus.x == -9999){
-                 Util.displayMessage("Click on a waypoint first.", "Error");
-            } else{
+
+        void overrideHeading() {
+
+            if (waypointInFocus.x == -9999) {
+                Util.displayMessage("Click on a waypoint first.", "Error");
+            } else {
                 double h = Double.valueOf(JOptionPane.showInputDialog(null, "Heading Override", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                 double slope = Util.angleToSlope(h);
-                waypoints.get((int)waypointInFocus.h).isOverridden = true;
-                waypoints.get((int)waypointInFocus.h).quinticOverride = slope;
+                waypoints.get((int) waypointInFocus.h).isOverridden = true;
+                waypoints.get((int) waypointInFocus.h).quinticOverride = slope;
             }
             recalculateAllSplines(splines, sGroups, LOW_RES);
         }
@@ -393,8 +395,94 @@ public class AutonomousMode extends TimerTask {
          * @param sGroups
          */
         public void recalculateAllSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups, int resolution) {
-            // print(waypoints.get(splines.get(0).getWaypointIndex()).h + " h at "  + splines.get(0).getWaypointIndex());
-            //do groups first
+
+            calculateSplines(splines, sGroups, resolution);
+//            // print(waypoints.get(splines.get(0).getWaypointIndex()).h + " h at "  + splines.get(0).getWaypointIndex());
+//            //do groups first
+//            if (sGroups.size() > 0) {
+//                for (int i = 0; i < sGroups.size(); i++) {
+//                    int startPoint = sGroups.get(i).getStartingIndex();
+//                    for (int j = 0; j < 6; j++) {
+//                        sGroups.get(i).setPoint(
+//                                (int) waypoints.get(startPoint + j).x,
+//                                (int) waypoints.get(startPoint + j).y, j);
+//
+//                        //System.out.println(waypoints.get(waypoints.size()-1).x);
+//                    }
+//                    //set slopes.
+//                    sGroups.get(i).calculateSpline(1/(double)resolution); //stupid rounding.
+//
+//                    waypoints.get(startPoint).h = sGroups.get(i).getStartDYDX();
+//                    waypoints.get(startPoint + 5).h = sGroups.get(i).getEndDYDX();
+//
+//                }
+//            }
+//            if (splines.size() > 0) {
+//                for (int i = 0; i < splines.size(); i++) {
+//
+//                    double x0, x1, y0, y1;
+//                    x0 = waypoints.get(splines.get(i).getWaypointIndex()).x;
+//                    x1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).x;
+//                    y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
+//                    y1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).y;
+//                    splines.get(i).setExtremePoints(x0, y0, x1, y1);
+//                    splines.get(i).calculateSegments(resolution);
+//                    //do some slopes.
+//                    double dydx0 = waypoints.get(splines.get(i).getWaypointIndex() - 1).h;
+//                    double dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).h;
+//                    //print(waypoints.get(splines.get(i).getWaypointIndex()).h + " h at "  + splines.get(i).getWaypointIndex());
+//                    if(waypoints.get(splines.get(i).getWaypointIndex()).isOverridden){
+//                        dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
+//                    }
+//                    if(waypoints.get(splines.get(i).getWaypointIndex()-1).isOverridden){
+//                        dydx0 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
+//                    }
+//                    splines.get(i).setStartDYDX(dydx1);
+//                    splines.get(i).setEndDYDX(dydx0);
+//                    
+//                    splines.get(i).calculateSegments(resolution);
+//                    waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
+//                    waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();
+//                    //if we've got quintic-quintic, quintic-end, begininning-quintic
+//                    //allow point rotation
+//                    //there's possibilities for array oob, so try/catch.
+//                    try {
+//                        if ("Quintic".equals(splines.get(i).getType())||"Parametric Quintic".equals(splines.get(i).getType())) {
+//                            System.out.println("AAAA");
+//                            boolean rotateEnd = false;
+//                            boolean rotateStart = false;
+//                            if (splines.get(i).getWaypointIndex() == waypoints.size() - 1) {
+//                                print("a");
+//                                //at end of list.
+//                                rotateEnd = true;
+//                            } else if ("Quintic".equals(splines.get(i - 1).getType())||"Parametric Quintic".equals(splines.get(i - 1).getType())) {
+//                                rotateStart = true;
+//                                print("b");
+//                            }
+//                            if (splines.get(i).getWaypointIndex() == 1) {
+//                                print("c");
+//                                //at the beginning
+//                                rotateStart = true;
+//                            } else if ("Quintic".equals(splines.get(i + 1).getType())||"Parametric Quintic".equals(splines.get(i + 1).getType())) {
+//                                rotateEnd = true;
+//                                print("d");
+//                            }
+//                            waypoints.get(splines.get(i).getWaypointIndex()).setRotate(rotateEnd);//does nothing?
+//                            waypoints.get(splines.get(i).getWaypointIndex() - 1).setRotate(rotateStart);
+//
+//                        }
+//                    } catch (IndexOutOfBoundsException ex) {
+//
+//                    }
+//
+//                }
+//            }
+
+        }
+
+        public void calculateSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups, int resolution) {
+            //first we do things that don't depend on derivatives of others.
+//                //this is all the splinegroup type splines.
             if (sGroups.size() > 0) {
                 for (int i = 0; i < sGroups.size(); i++) {
                     int startPoint = sGroups.get(i).getStartingIndex();
@@ -406,23 +494,42 @@ public class AutonomousMode extends TimerTask {
                         //System.out.println(waypoints.get(waypoints.size()-1).x);
                     }
                     //set slopes.
-                    sGroups.get(i).calculateSpline(1/(double)resolution); //stupid rounding.
+                    sGroups.get(i).calculateSpline(1 / (double) resolution); //stupid rounding.
 
                     waypoints.get(startPoint).h = sGroups.get(i).getStartDYDX();
                     waypoints.get(startPoint + 5).h = sGroups.get(i).getEndDYDX();
+                    //System.out.println("slope at " + startPoint + " is " + sGroups.get(i).getStartDYDX());
+                    //System.out.println("slope at " + startPoint+5 + " is " + sGroups.get(i).getEndDYDX());
+                }
+            }
+            //more not dependent stuffs.
+            if (splines.size() > 0) {
+                for (int i = 0; i < splines.size(); i++) {
+                    if ("Line".equals(splines.get(i).getType())) {
+                        double x0, x1, y0, y1;
+                        x0 = waypoints.get(splines.get(i).getWaypointIndex()).x;
+                        x1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).x;
+                        y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
+                        y1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).y;
+                        
+                        splines.get(i).setExtremePoints(x0, y0, x1, y1);
+                        splines.get(i).calculateSegments(resolution);
+                        waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).endDYDX();
+                        waypoints.get(splines.get(i).getWaypointIndex()-1).h = splines.get(i).endDYDX();
+                    }
 
                 }
             }
-            if (splines.size() > 0) {
-                for (int i = 0; i < splines.size(); i++) {
-
-                    double x0, x1, y0, y1;
+            //now dependent stuffs.
+            for (int i = 0; i < splines.size(); i++) {
+                if (!"Line".equals(splines.get(i).getType())) {
+                   double x0, x1, y0, y1;
                     x0 = waypoints.get(splines.get(i).getWaypointIndex()).x;
                     x1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).x;
                     y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
                     y1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).y;
                     splines.get(i).setExtremePoints(x0, y0, x1, y1);
-                    splines.get(i).calculateSegments(resolution);
+                    //splines.get(i).calculateSegments(resolution);
                     //do some slopes.
                     double dydx0 = waypoints.get(splines.get(i).getWaypointIndex() - 1).h;
                     double dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).h;
@@ -437,39 +544,38 @@ public class AutonomousMode extends TimerTask {
                     splines.get(i).setEndDYDX(dydx0);
                     
                     splines.get(i).calculateSegments(resolution);
-                    waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
-                    waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();
+                    //waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
+                    //waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();
                     //if we've got quintic-quintic, quintic-end, begininning-quintic
                     //allow point rotation
                     //there's possibilities for array oob, so try/catch.
-                    try {
-                        if ("Quintic".equals(splines.get(i).getType())||"Parametric Quintic".equals(splines.get(i).getType())) {
-                            boolean rotateEnd = false;
-                            boolean rotateStart = false;
-                            if (splines.get(i).getWaypointIndex() == waypoints.size() - 1) {
-                                print("a");
-                                //at end of list.
-                                rotateEnd = true;
-                            } else if ("Quintic".equals(splines.get(i - 1).getType())||"Parametric Quintic".equals(splines.get(i - 1).getType())) {
-                                rotateStart = true;
-                                print("b");
-                            }
-                            if (splines.get(i).getWaypointIndex() == 1) {
-                                print("c");
-                                //at the beginning
-                                rotateStart = true;
-                            } else if ("Quintic".equals(splines.get(i + 1).getType())) {
-                                rotateEnd = true;
-                                print("d");
-                            }
-                            waypoints.get(splines.get(i).getWaypointIndex()).setRotate(rotateEnd);//does nothing?
-                            waypoints.get(splines.get(i).getWaypointIndex() - 1).setRotate(rotateStart);
+//                    try {
+//                        if ("Quintic".equals(splines.get(i).getType())||"Parametric Quintic".equals(splines.get(i).getType())) {
+//                            boolean rotateEnd = false;
+//                            boolean rotateStart = false;
+//                            if (splines.get(i).getWaypointIndex() == waypoints.size() - 1) {
+//                                print("a");
+//                                //at end of list.
+//                                rotateEnd = true;
+//                            } else if ("Quintic".equals(splines.get(i - 1).getType())||"Parametric Quintic".equals(splines.get(i - 1).getType())) {
+//                                rotateStart = true;
+//                                print("b");
+//                            }
+//                            if (splines.get(i).getWaypointIndex() == 1) {
+//                                print("c");
+//                                //at the beginning
+//                                rotateStart = true;
+//                            } else if ("Quintic".equals(splines.get(i + 1).getType())||"Parametric Quintic".equals(splines.get(i + 1).getType())) {
+//                                rotateEnd = true;
+//                                print("d");
+//                            }
+//                            waypoints.get(splines.get(i).getWaypointIndex()).setRotate(rotateEnd);//does nothing?
+//                            waypoints.get(splines.get(i).getWaypointIndex() - 1).setRotate(rotateStart);
+//
+//                        }
+//                    } catch (IndexOutOfBoundsException ex) {
 
-                        }
-                    } catch (IndexOutOfBoundsException ex) {
-
-                    }
-
+//                    }
                 }
             }
 
@@ -478,13 +584,14 @@ public class AutonomousMode extends TimerTask {
         public void print(Object s) {
             //System.out.println(s);
         }
-        
+
         public void printl(Object s) {
             System.out.println(s);
         }
 
         /**
-         * Joins all splines in editor sequentially by spline ID. Has many for loops.
+         * Joins all splines in editor sequentially by spline ID. Has many for
+         * loops.
          *
          * @return
          */
@@ -515,7 +622,7 @@ public class AutonomousMode extends TimerTask {
                     } catch (IndexOutOfBoundsException e) {
 
                     }
-                    
+
                 }
                 if (isGroup) {
                     for (int k = 0; k < sGroup.getSegments().s.size(); k++) {
@@ -525,7 +632,7 @@ public class AutonomousMode extends TimerTask {
                         s.add(seg);
                     }
                 } else {
-                    for (int l = spline.getSegments().s.size()-1; l > -1; l--) {
+                    for (int l = spline.getSegments().s.size() - 1; l > -1; l--) {
                         Segment seg = new Segment();
                         seg.x = spline.getSegments().s.get(l).x;
                         seg.y = spline.getSegments().s.get(l).y;
