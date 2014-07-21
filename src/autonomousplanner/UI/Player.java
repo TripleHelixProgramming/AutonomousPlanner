@@ -120,9 +120,9 @@ class Window extends JComponent {
             g.drawOval((int) x - 40+ k_left, (int) y - 40, 80, 80);
 			//automatically increment to next frame if auto playing
             if(isAutomated){
-            i += 2;
+            i += 0.5;
 			//restart if needed.
-            if (i > s.s.size()- 2) {
+            if (i > s.s.size()- 0.1) {
                 i = 0;
             }
             }

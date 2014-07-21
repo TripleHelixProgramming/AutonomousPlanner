@@ -46,7 +46,7 @@ public class AutonomousMode extends TimerTask {
     int currentID = 0;
 
     int LOW_RES = 100;
-    int HIGH_RES = 100;
+    int HIGH_RES = 10000;
 
     /**
      * Make new auto mode.
@@ -88,6 +88,7 @@ public class AutonomousMode extends TimerTask {
 
         //THIS VALUE FOR RESOLUTION!!!
         int pointMover;
+        boolean canDraw = true;
         boolean isDragging; //java mouse listeners );
         @SuppressWarnings("LeakingThisInConstructor")
         ArrayList<Point> waypoints = new ArrayList<>();
@@ -112,6 +113,8 @@ public class AutonomousMode extends TimerTask {
          */
         @Override
         public void paintComponent(Graphics g) {
+            if(canDraw){
+            calculateSplines(100);
             Image img = null;
             try {
                 img = ImageIO.read(new File("Untitled.png"));
@@ -127,7 +130,7 @@ public class AutonomousMode extends TimerTask {
             //focused point
             Drawing.drawFocusedPointAt(
                     waypointInFocus.x, waypointInFocus.y, 10, g);
-            drawSplines(g, splines, sGroups);
+            drawSplines(g, splines, sGroups);}
         }
 
         /**
@@ -141,6 +144,14 @@ public class AutonomousMode extends TimerTask {
                 Drawing.drawFilledCircleAt(
                         waypoints.get(i).x, waypoints.get(i).y, 7, g);
             }
+        }
+        
+        public void startDrawing(){
+            canDraw = true;
+        }
+        
+        public void stopDrawing(){
+            canDraw = false;
         }
 
         /**
@@ -201,13 +212,14 @@ public class AutonomousMode extends TimerTask {
                         Util.displayMessage(String.valueOf(waypoints.get(i).h), "WAYPOINT HEADING");
                         double xNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "X Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
                         double yNew = 20 * Double.valueOf(JOptionPane.showInputDialog(null, "Y Value", "Waypoint", JOptionPane.PLAIN_MESSAGE));
-                        if (waypoints.get(i).getRotate()) {
+                        if (true) {
                             double hNew = Double.valueOf(JOptionPane.showInputDialog(null, "Heading", "Waypoint", JOptionPane.PLAIN_MESSAGE));
+                            waypoints.set(i, coordinateTransform(new Point(250 + xNew, 250 + yNew)));
                             waypoints.get(i).h = hNew;
                             waypoints.get(i).quinticOverride = hNew;
-                            print(waypoints.get(i).h + " starteh at " + i);
+                            //print(waypoints.get(i).h + " starteh at " + i);
                         }
-                        waypoints.set(i, coordinateTransform(new Point(250 + xNew, 250 + yNew)));
+
                         recalculateAllSplines(splines, sGroups, LOW_RES);
                         //find out if we need to have a heading prompt.
 
@@ -396,7 +408,7 @@ public class AutonomousMode extends TimerTask {
          */
         public void recalculateAllSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups, int resolution) {
 
-            calculateSplines(splines, sGroups, resolution);
+            calculateSplines(resolution);
 //            // print(waypoints.get(splines.get(0).getWaypointIndex()).h + " h at "  + splines.get(0).getWaypointIndex());
 //            //do groups first
 //            if (sGroups.size() > 0) {
@@ -480,7 +492,7 @@ public class AutonomousMode extends TimerTask {
 
         }
 
-        public void calculateSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups, int resolution) {
+        public void calculateSplines(int resolution) {
             //first we do things that don't depend on derivatives of others.
 //                //this is all the splinegroup type splines.
             if (sGroups.size() > 0) {
@@ -511,11 +523,11 @@ public class AutonomousMode extends TimerTask {
                         x1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).x;
                         y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
                         y1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).y;
-                        
+
                         splines.get(i).setExtremePoints(x0, y0, x1, y1);
                         splines.get(i).calculateSegments(resolution);
                         waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).endDYDX();
-                        waypoints.get(splines.get(i).getWaypointIndex()-1).h = splines.get(i).endDYDX();
+                        waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
                     }
 
                 }
@@ -523,7 +535,7 @@ public class AutonomousMode extends TimerTask {
             //now dependent stuffs.
             for (int i = 0; i < splines.size(); i++) {
                 if (!"Line".equals(splines.get(i).getType())) {
-                   double x0, x1, y0, y1;
+                    double x0, x1, y0, y1;
                     x0 = waypoints.get(splines.get(i).getWaypointIndex()).x;
                     x1 = waypoints.get(splines.get(i).getWaypointIndex() - 1).x;
                     y0 = waypoints.get(splines.get(i).getWaypointIndex()).y;
@@ -533,16 +545,22 @@ public class AutonomousMode extends TimerTask {
                     //do some slopes.
                     double dydx0 = waypoints.get(splines.get(i).getWaypointIndex() - 1).h;
                     double dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).h;
-                    //print(waypoints.get(splines.get(i).getWaypointIndex()).h + " h at "  + splines.get(i).getWaypointIndex());
-                    if(waypoints.get(splines.get(i).getWaypointIndex()).isOverridden){
+                    if (waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride != -999) {
                         dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
                     }
-                    if(waypoints.get(splines.get(i).getWaypointIndex()-1).isOverridden){
+                    if (waypoints.get(splines.get(i).getWaypointIndex() - 1).quinticOverride != -999) {
+                        dydx0 = waypoints.get(splines.get(i).getWaypointIndex() - 1).quinticOverride;
+                    }
+                    //print(waypoints.get(splines.get(i).getWaypointIndex()).h + " h at "  + splines.get(i).getWaypointIndex());
+                    if (waypoints.get(splines.get(i).getWaypointIndex()).isOverridden) {
+                        dydx1 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
+                    }
+                    if (waypoints.get(splines.get(i).getWaypointIndex() - 1).isOverridden) {
                         dydx0 = waypoints.get(splines.get(i).getWaypointIndex()).quinticOverride;
                     }
                     splines.get(i).setStartDYDX(dydx1);
                     splines.get(i).setEndDYDX(dydx0);
-                    
+
                     splines.get(i).calculateSegments(resolution);
                     //waypoints.get(splines.get(i).getWaypointIndex() - 1).h = splines.get(i).endDYDX();
                     //waypoints.get(splines.get(i).getWaypointIndex()).h = splines.get(i).startDYDX();
@@ -586,7 +604,7 @@ public class AutonomousMode extends TimerTask {
         }
 
         public void printl(Object s) {
-            System.out.println(s);
+            //System.out.println(s);
         }
 
         /**
@@ -625,26 +643,47 @@ public class AutonomousMode extends TimerTask {
 
                 }
                 if (isGroup) {
+                    ArrayList<Segment> p = sGroup.getSegments().s;
                     for (int k = 0; k < sGroup.getSegments().s.size(); k++) {
                         Segment seg = new Segment();
-                        seg.x = sGroup.getSegments().s.get(k).x;
-                        seg.y = sGroup.getSegments().s.get(k).y;
+                        seg.x = p.get(k).x;
+                        seg.y = p.get(k).y;
                         s.add(seg);
                     }
                 } else {
-                    for (int l = spline.getSegments().s.size() - 1; l > -1; l--) {
+                    ArrayList<Segment> p = spline.getSegments().s;
+                    System.out.println(spline.getSegments().s.size());
+//                        for (int l = 0; l < spline.getSegments().s.size(); l++) {
+////                            Segment seg = new Segment();
+////                            seg.x = p.get(l).x;
+////                            seg.y = p.get(l).y;
+////                            s.add(seg);
+////                            //System.out.println("t");
+////                             //System.out.println(spline.getSegments().s.size() + " size");
+//                        }    
+                    for(int turd = p.size()-1; turd > -1; turd--){
                         Segment seg = new Segment();
-                        seg.x = spline.getSegments().s.get(l).x;
-                        seg.y = spline.getSegments().s.get(l).y;
-                        s.add(seg);
+                           seg.x = p.get(turd).x;
+                           seg.y = p.get(turd).y;
+                           s.add(seg);
                     }
-
                 }
             }
 
             return s;
         }
 
+    }
+    /**
+     * Flip the last spline to the opposite of what is is now.
+     */
+    void flipLastSpline(){
+        splines.get(splines.size()-1).setFlipped(!splines.get(splines.size()-1).isFlipped());
+        display.calculateSplines(100);
+        display.repaint();
+    }
+    
+    void setParameterRange(double max, double min){
     }
 
 }

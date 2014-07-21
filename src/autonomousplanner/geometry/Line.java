@@ -175,62 +175,6 @@ public class Line implements Spline {
         
     }
     
-    /**
-     * Is it 1st/2nd derivative continuous at the end?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtEnd() {
-        return false;
-    }
-    /**
-     * Is it 1st/2nd derivative continuous at the beginning?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtBeginning() {
-        return false;
-    }
-
-    /**
-     * Is the left end the absolute end?.
-     * Left means first point, not leftmost.
-     * @return
-     */
-    @Override
-    public boolean leftEndIsAbsoluteEnd() {
-        return leftAbsEnd;
-    }
-
-    /**
-     * Is the right end the absolute end?.
-     * Right means last, not rightmost.
-     * @return
-     */
-    @Override
-    public boolean rightEngIsAbsoluteEnd() {
-        return rightAbsEnd;
-    }
-
-    /**
-     * Set first point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setLeftEndAbsolute(boolean isAbsolute) {
-        leftAbsEnd = isAbsolute;
-    }
-
-    /**
-     * Set last point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setRightEndAbsolute(boolean isAbsolute) {
-        rightAbsEnd = isAbsolute;
-    }
     
     /**
      * The type of spline.
@@ -254,6 +198,15 @@ public class Line implements Spline {
     @Override
     public SegmentGroup getParametricData(boolean isY) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isFlipped() {
+        return false; //it's a line!
+    }
+
+    @Override
+    public void setFlipped(boolean isFlipped) {
     }
 
 }

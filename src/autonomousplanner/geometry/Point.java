@@ -20,7 +20,7 @@ public class Point {
     /**
      * y point.
      */
-    y, h, quinticOverride;
+    y, h, quinticOverride = -999;
     boolean canRotate;
     public boolean isOverridden = false;
 

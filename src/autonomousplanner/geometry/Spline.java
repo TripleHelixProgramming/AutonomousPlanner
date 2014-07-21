@@ -17,14 +17,11 @@ public interface Spline {
     public double endDYDX();
     public void setStartDYDX(double dydx);
     public void setEndDYDX(double dydx);
-    public boolean isContinuousAtEnd();
-    public boolean isContinuousAtBeginning();
-    public boolean leftEndIsAbsoluteEnd();
-    public boolean rightEngIsAbsoluteEnd();
-    public void setLeftEndAbsolute(boolean isAbsolute);
-    public void setRightEndAbsolute(boolean isAbsolute);
+  
     public String getType();
     public int splineID();
     public void setSplineID(int id);
     public SegmentGroup getParametricData(boolean isY);
+    public boolean isFlipped();
+    public void setFlipped(boolean isFlipped);
 }

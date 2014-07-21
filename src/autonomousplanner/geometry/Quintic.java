@@ -135,6 +135,17 @@ public class Quintic implements Spline {
             yList.add(evaluateSpline((double) i / distancep) * d_x);
         }
     }
+    
+    public void getBigScaledPoints() {
+        distancep = 10000;
+        //go from 1 to 1000 little tiny steps.
+        for (int i = 0; i < distancep; i++) {
+            //add each point to sequence.
+            double j = (double) i / distancep;
+            xList.add((j * d_x) + xChange);
+            yList.add(evaluateSpline((double) i / distancep) * d_x);
+        }
+    }
     /**
      * Get all the segments!
      * @return 
@@ -149,10 +160,11 @@ public class Quintic implements Spline {
      * @param resolution
      */
     @Override
-    public void calculateSegments(int resolution) {
+    public synchronized void calculateSegments(int resolution) {
+        distancep = resolution;
         getScaledPoints();
         sg.s.clear();
-        distancep = resolution;
+        
 
         for (int i = 0; i < xList.size(); i++) {
             Segment s = new Segment();
@@ -234,63 +246,7 @@ public class Quintic implements Spline {
     public void setEndDYDX(double dydx) {
         q1 = dydx;
     }
-
-    /**
-     * Is it 1st/2nd derivative continuous at the end?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtEnd() {
-        return true;
-    }
-    /**
-     * Is it 1st/2nd derivative continuous at the beginning?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtBeginning() {
-        return true;
-    }
-
-    /**
-     * Is the left end the absolute end?.
-     * Left means first point, not leftmost.
-     * @return
-     */
-    @Override
-    public boolean leftEndIsAbsoluteEnd() {
-        return leftAbsEnd;
-    }
-
-    /**
-     * Is the right end the absolute end?.
-     * Right means last, not rightmost.
-     * @return
-     */
-    @Override
-    public boolean rightEngIsAbsoluteEnd() {
-        return rightAbsEnd;
-    }
-
-    /**
-     * Set first point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setLeftEndAbsolute(boolean isAbsolute) {
-        leftAbsEnd = isAbsolute;
-    }
-
-    /**
-     * Set last point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setRightEndAbsolute(boolean isAbsolute) {
-        rightAbsEnd = isAbsolute;
-    }
+   
     /**
      * The type of spline.
      * @return
@@ -313,6 +269,15 @@ public class Quintic implements Spline {
     @Override
     public SegmentGroup getParametricData(boolean isY) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean isFlipped() {
+        return false;
+    }
+
+    @Override
+    public void setFlipped(boolean isFlipped) {
     }
 
 }
