@@ -26,4 +26,5 @@ public interface Spline {
     public String getType();
     public int splineID();
     public void setSplineID(int id);
+    public SegmentGroup getParametricData(boolean isY);
 }

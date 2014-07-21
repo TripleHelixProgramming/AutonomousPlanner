@@ -251,4 +251,9 @@ public class Line implements Spline {
         this.ID = id;
     }
 
+    @Override
+    public SegmentGroup getParametricData(boolean isY) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

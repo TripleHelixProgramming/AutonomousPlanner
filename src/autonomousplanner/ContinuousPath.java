@@ -446,7 +446,7 @@ public final class ContinuousPath {
     /**
      * Makes a simple linear function to solve for all values of the segment at
      * any point t within [a.time, b.time]. Not very useful for little gaps,
-     * hella useful for big jumps.
+     *  useful for big jumps.
      *
      * @param a The segment before.
      * @param b The segment after.

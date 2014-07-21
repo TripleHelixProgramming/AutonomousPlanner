@@ -1,9 +1,10 @@
 package autonomousplanner.UI;
 
-import autonomousplanner.geometry.Drawing;
 import autonomousplanner.Util;
 import autonomousplanner.geometry.Cubic;
+import autonomousplanner.geometry.Drawing;
 import autonomousplanner.geometry.Line;
+import autonomousplanner.geometry.ParametricQuintic;
 import autonomousplanner.geometry.Point;
 import autonomousplanner.geometry.Quintic;
 import autonomousplanner.geometry.Segment;
@@ -11,10 +12,17 @@ import autonomousplanner.geometry.SegmentGroup;
 import autonomousplanner.geometry.Spline;
 import autonomousplanner.geometry.SplineGroup;
 import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -38,7 +46,7 @@ public class AutonomousMode extends TimerTask {
     int currentID = 0;
 
     int LOW_RES = 100;
-    int HIGH_RES = 10000;
+    int HIGH_RES = 100;
 
     /**
      * Make new auto mode.
@@ -104,6 +112,13 @@ public class AutonomousMode extends TimerTask {
          */
         @Override
         public void paintComponent(Graphics g) {
+            Image img = null;
+            try {
+                img = ImageIO.read(new File("Untitled.png"));
+            } catch (IOException ex) {
+                System.out.println(ex);
+            }
+            g.drawImage(img, 0, 0, null);
             //origin
             g.drawOval(250 - 5, 250 - 5, 10, 10);
             //last click
@@ -264,44 +279,62 @@ public class AutonomousMode extends TimerTask {
          */
         public void addSegment(String type, double x, double y) {
 
-            if ("Line".equals(type)) {
-                waypoints.add(new Point(x, y));
-                int i = waypoints.size() - 1;
-                Line line = new Line(waypoints.get(i - 1).x, x,
-                        waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
-                line.calculateSegments(LOW_RES);
-                line.setStartingWaypointIndex(waypoints.size() - 1);
-                line.setSplineID(currentID);
-                currentID++;
-                splines.add(line);
-
-            } else if ("Piecewise Cubic".equals(type)) {
-
-                //placeholder test
-                //add six new waypoints.
-                Cubic c = new Cubic();
-                c.setStartingIndex(waypoints.size() - 1);
-                Point p = waypoints.get(waypoints.size() - 1);
-                addCubicWaypoints(p.x, p.y, lastClicked.x, lastClicked.y, waypoints);
-                waypoints.add(new Point(x, y));
-                c.setSplineID(currentID);
-                currentID++;
-                sGroups.add(c);
-                recalculateAllSplines(splines, sGroups, LOW_RES);
-
-            } else if ("Quintic".equals(type)) {
-                waypoints.add(new Point(x, y));
-                int i = waypoints.size() - 1;
-                Quintic q = new Quintic(waypoints.get(i - 1).x, x,
-                        waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
-                q.setStartingWaypointIndex(waypoints.size() - 1);
-                q.setSplineID(currentID);
-                currentID++;
-                splines.add(q);
-                recalculateAllSplines(splines, sGroups, LOW_RES);
-
+            if (null != type) switch (type) {
+                case "Line":{
+                    waypoints.add(new Point(x, y));
+                        int i = waypoints.size() - 1;
+                        Line line = new Line(waypoints.get(i - 1).x, x,
+                                waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
+                        line.calculateSegments(LOW_RES);
+                        line.setStartingWaypointIndex(waypoints.size() - 1);
+                        line.setSplineID(currentID);
+                        currentID++;
+                        splines.add(line);
+                        break;
+                    }
+                case "Piecewise Cubic":
+                    //placeholder test
+                    //add six new waypoints.
+                    Cubic c = new Cubic();
+                    c.setStartingIndex(waypoints.size() - 1);
+                    Point p = waypoints.get(waypoints.size() - 1);
+                    addCubicWaypoints(p.x, p.y, lastClicked.x, lastClicked.y, waypoints);
+                    waypoints.add(new Point(x, y));
+                    c.setSplineID(currentID);
+                    currentID++;
+                    sGroups.add(c);
+                    recalculateAllSplines(splines, sGroups, LOW_RES);
+                    break;
+                case "Quintic":{
+                    waypoints.add(new Point(x, y));
+                        int i = waypoints.size() - 1;
+                        Quintic q = new Quintic(waypoints.get(i - 1).x, x,
+                                waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
+                        q.setStartingWaypointIndex(waypoints.size() - 1);
+                        q.setSplineID(currentID);
+                        currentID++;
+                        splines.add(q);
+                        recalculateAllSplines(splines, sGroups, LOW_RES);
+                        break;
+                    }
+                case "Parametric Quintic":{
+                    waypoints.add(new Point(x, y));
+                        int i = waypoints.size() - 1;
+                        ParametricQuintic q = new ParametricQuintic(waypoints.get(i - 1).x, x,
+                                waypoints.get(i - 1).y, y, waypoints.get(i - 1).h, 0);
+                        q.setStartingWaypointIndex(waypoints.size() - 1);
+                        q.setSplineID(currentID);
+                        currentID++;
+                        splines.add(q);
+                        recalculateAllSplines(splines, sGroups, LOW_RES);
+                        break;
+                    }
             }
         }
+        
+//        public void testMethod(){
+//            Util.makeGraph(splines.get(0).getParametricData(true), "a", "b");
+//        }
 
         /**
          * Adds some cool equidistant points.
@@ -410,14 +443,14 @@ public class AutonomousMode extends TimerTask {
                     //allow point rotation
                     //there's possibilities for array oob, so try/catch.
                     try {
-                        if ("Quintic".equals(splines.get(i).getType())) {
+                        if ("Quintic".equals(splines.get(i).getType())||"Parametric Quintic".equals(splines.get(i).getType())) {
                             boolean rotateEnd = false;
                             boolean rotateStart = false;
                             if (splines.get(i).getWaypointIndex() == waypoints.size() - 1) {
                                 print("a");
                                 //at end of list.
                                 rotateEnd = true;
-                            } else if ("Quintic".equals(splines.get(i - 1).getType())) {
+                            } else if ("Quintic".equals(splines.get(i - 1).getType())||"Parametric Quintic".equals(splines.get(i - 1).getType())) {
                                 rotateStart = true;
                                 print("b");
                             }

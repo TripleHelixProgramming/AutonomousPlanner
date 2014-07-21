@@ -47,7 +47,7 @@ public class Toolbox extends javax.swing.JFrame {
         setTitle("Toolbox");
         setAlwaysOnTop(true);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Line", "Piecewise Cubic", "Quintic" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Line", "Piecewise Cubic", "Quintic", "Parametric Quintic" }));
 
         jLabel1.setText("Type");
 
@@ -219,9 +219,10 @@ public class Toolbox extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
     void finalizePath() {
         Path path = new Path(editor.display.joinSplines());
-
         bot = new ContinuousPath(path);
-        Player player = new Player(bot);
+        Player player = new Player(bot.timeSegments, bot.left, bot.right);
+                //editor.display.testMethod();
+
     }
 
 }
