@@ -5,7 +5,7 @@ import autonomousplanner.Path;
 import autonomousplanner.geometry.SegmentGroup;
 
 /**
- *
+ * An always on top window with tools for the editor.
  * @author Jared
  */
 public class Toolbox extends javax.swing.JFrame {

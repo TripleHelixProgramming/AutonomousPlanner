@@ -13,15 +13,12 @@ import autonomousplanner.geometry.Spline;
 import autonomousplanner.geometry.SplineGroup;
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -146,10 +143,18 @@ public class AutonomousMode extends TimerTask {
             }
         }
         
+        /**
+         * Enable drawing to screen.
+         */
         public void startDrawing(){
             canDraw = true;
         }
         
+        /**
+         * Disable drawing to screen.
+         * Useful when modifying data normally used
+         * in the drawing process.
+         */
         public void stopDrawing(){
             canDraw = false;
         }
@@ -193,6 +198,11 @@ public class AutonomousMode extends TimerTask {
 
         }
 
+        /**
+         * Take care of left/right mouse clicks.
+         * 
+         * @param me
+         */
         @Override
         public void mousePressed(MouseEvent me) {
 
@@ -239,11 +249,23 @@ public class AutonomousMode extends TimerTask {
             lastClicked.y = y;
         }
 
+        /**
+         * A somewhat useless appearing method. 
+         * It takes a point, and moves it to the position it is already at.
+         * It likely does nothing, but netbeans didn't recognize the project
+         * properly when I deleted it, so I'm a little scared to remove it.
+         * @param in
+         * @return
+         */
         public Point coordinateTransform(Point in) {
             in.move((in.x), (in.y));
             return in;
         }
 
+        /**
+         * Turn off movement when mouse is released.
+         * @param me
+         */
         @Override
         public void mouseReleased(MouseEvent me) {
             //kill move flag when mouse is released.
@@ -261,6 +283,10 @@ public class AutonomousMode extends TimerTask {
         public void mouseExited(MouseEvent me) {
         }
 
+        /**
+         * Take care of actually moving dragged waypoints.
+         * @param me
+         */
         @Override
         public void mouseDragged(MouseEvent me) {
             //hackish way with dealing with mousedragged called before
@@ -352,7 +378,7 @@ public class AutonomousMode extends TimerTask {
 //        }
         /**
          * Adds some cool equidistant points.
-         *
+         * Used for cubic thing.
          * @param x0
          * @param y0
          * @param x1
@@ -386,7 +412,10 @@ public class AutonomousMode extends TimerTask {
             recalculateAllSplines(splines, sGroups, LOW_RES);
             repaint();
         }
-
+        /**
+         * Override an existing preset heading.
+         * May cause first or second derivative discontinuities.
+         */
         void overrideHeading() {
 
             if (waypointInFocus.x == -9999) {
@@ -402,9 +431,16 @@ public class AutonomousMode extends TimerTask {
 
         /**
          * If splines exist, recalculate. This is a small disaster.
-         *
+         * The trick is calculating things in the right order.
+         * In order to make the the quintic things continuous, I must calculate
+         * the cubics and lines first.  Then, I somehow have to pass these slopes
+         * to the quintics.
+         * The trick is that there can be any number (or none) of each type of spline
+         * and the splines can be arranged in any way, but only certain combinations
+         * result in certain slopes.
          * @param splines
          * @param sGroups
+         * @param resolution
          */
         public void recalculateAllSplines(ArrayList<Spline> splines, ArrayList<SplineGroup> sGroups, int resolution) {
 
@@ -492,6 +528,12 @@ public class AutonomousMode extends TimerTask {
 
         }
 
+        /**
+         * A second attempt at calculating splines in an effective order.
+         * It works, but if you put in a bad combination, it doesn't
+         * know it's not C1.
+         * @param resolution
+         */
         public void calculateSplines(int resolution) {
             //first we do things that don't depend on derivatives of others.
 //                //this is all the splinegroup type splines.
@@ -610,6 +652,8 @@ public class AutonomousMode extends TimerTask {
         /**
          * Joins all splines in editor sequentially by spline ID. Has many for
          * loops.
+         * Tricky because some splines are backward, and "start segment" isn't
+         * always what I think it is.
          *
          * @return
          */

@@ -134,14 +134,28 @@ public class Point {
         return p;
     }
     
+    /**
+     * The x and y coordinates of point.
+     * @return
+     */
+    @Override
     public String toString(){
         return "X: " + x + " Y: " + y;
     }
     
+    /**
+     * Can this point be freely rotated?
+     * 
+     * @param rotate
+     */
     public void setRotate(boolean rotate){
         canRotate = rotate;
     }
     
+    /**
+     * Can this point be freely rotated?
+     * @return
+     */
     public boolean getRotate(){
         return canRotate;
     }

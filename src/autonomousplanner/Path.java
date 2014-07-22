@@ -152,6 +152,7 @@ public class Path {
     
     /**
      * "Walk" across the spline, splitting into equal segments.
+     * Not used currently
      */
     public void walkSpline() {
         long start = System.currentTimeMillis();

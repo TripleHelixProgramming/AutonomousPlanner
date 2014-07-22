@@ -7,7 +7,7 @@ import autonomousplanner.geometry.Quintic;
 import autonomousplanner.geometry.SegmentGroup;
 
 /**
- *
+ * A debugging tool to see how the splines look.
  * @author Jared
  */
 public class SplineTest extends javax.swing.JFrame {

@@ -14,7 +14,7 @@ public class AutonomousPlanner {
      */
     public static void main(String[] args) {
         //create the one and only start window
-        w.main(args);
+        StartWindow.main(args);
     }
     
 }

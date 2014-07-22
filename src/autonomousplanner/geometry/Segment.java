@@ -7,7 +7,7 @@
 package autonomousplanner.geometry;
 
 /**
- * A segment, which is a point in a path.
+ * A segment, which is a point in a path. It can store lots of data too.
  * @author Team 236
  */
 public class Segment {

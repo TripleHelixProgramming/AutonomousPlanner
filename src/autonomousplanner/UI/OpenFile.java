@@ -3,21 +3,25 @@ package autonomousplanner.UI;
 
 
 import autonomousplanner.ContinuousPath;
+import autonomousplanner.Util;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 
 /**
- * A save file dialog for saving a path.
+ * Open file dialog for importing an existing path.
+ * The file is read into a string, which is converted into
+ * a robot segment group, which can be manipulated easily.
  * @author Jared
  */
 @SuppressWarnings("serial")
-public class SaveFile extends javax.swing.JFrame {
-    ContinuousPath bot;
+public class OpenFile extends javax.swing.JFrame {
     /**
-     * Creates new form SaveFile
+     * Creates new form OpenFile
      * @param bot
      */
-    public SaveFile(ContinuousPath bot) {
-        this.bot = bot;
+    public OpenFile() {
         initComponents();
         this.setLocation(600, 100);
     }
@@ -33,7 +37,7 @@ public class SaveFile extends javax.swing.JFrame {
 
         jFileChooser1 = new javax.swing.JFileChooser();
 
-        jFileChooser1.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        jFileChooser1.setDialogType(javax.swing.JFileChooser.OPEN_DIALOG);
         jFileChooser1.setCurrentDirectory(new java.io.File("C:\\notarealfolder"));
         jFileChooser1.setDialogTitle("Open Path");
         jFileChooser1.addActionListener(new java.awt.event.ActionListener() {
@@ -66,7 +70,12 @@ public class SaveFile extends javax.swing.JFrame {
         if(evt.getActionCommand().equals(JFileChooser.CANCEL_SELECTION)){
             this.setVisible(false);
         }else{
-            bot.savePath(jFileChooser1.getSelectedFile().getAbsoluteFile());
+            //bot.savePath(jFileChooser1.getSelectedFile().getAbsoluteFile());
+            try {
+                new Player(Util.stringToPath236(Util.readStringFromFile(jFileChooser1.getSelectedFile())));
+            } catch (IOException ex) {
+                Logger.getLogger(OpenFile.class.getName()).log(Level.SEVERE, null, ex);
+            }
         this.setVisible(false);
         }
         

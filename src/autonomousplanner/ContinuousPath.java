@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- * The Robot! Does math involving time, acceleration, velocity, and jerk. Splits
+ * Does math involving time, acceleration, velocity, and jerk. Splits
  * into segments of equal time length.
  *
  * @author Team 236
@@ -40,7 +40,7 @@ public final class ContinuousPath {
      */
     public ContinuousPath(Path path) {
         try {
-            max_acc = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Acceleration", "Path", JOptionPane.PLAIN_MESSAGE));
+            max_acc = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Acceleration.  Input nothing to use defaults", "Path", JOptionPane.PLAIN_MESSAGE));
             max_dcc = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Deceleration", "Path", JOptionPane.PLAIN_MESSAGE));
             width = Double.valueOf(JOptionPane.showInputDialog(null, "Robot Width, feet", "Waypoint", JOptionPane.PLAIN_MESSAGE));
 
@@ -125,6 +125,7 @@ public final class ContinuousPath {
 
     /**
      * Slows down robot at the end of the path.
+     * Currently not used.
      */
     private void setEndVelocity() {
         double vLast = 0;
@@ -331,6 +332,9 @@ public final class ContinuousPath {
         print("     Average Speed: " + (timeSegments.s.get(timeSegments.s.size() - 1).posit / timeSegments.s.get(timeSegments.s.size() - 1).time));
     }
 
+    /**
+     *Recalculate values.  A double check of my previous math.
+     */
     public void recalculateValues() {
         for (int i = 0; i < timeSegments.s.size(); i++) {
             if (i != 0) {
@@ -345,6 +349,8 @@ public final class ContinuousPath {
     /**
      * Split a single robot path into paths for separate sides. Math taken from
      * Team 254's 2014 Code.
+     * Relocate x and y based off of robot width and robot angle, then
+     * recalculate all values for the new path.
      */
     public void splitLeftRight() {
         for (int i = 0; i < timeSegments.s.size(); i++) {
@@ -411,14 +417,18 @@ public final class ContinuousPath {
     public void savePath(File file) {
         long start = System.currentTimeMillis();
         print("Writing file...");
-        IO.writeFile(file, (left.toString() + '\n' + "A" + '\n'
-                + right.toString() + '\n' + "B" + '\n'
-                + timeSegments.toString()));
+        IO.writeFile(file, ("Potato" + '\n' + timeSegments.s.size() + '\n' + 
+                timeSegments.toString()
+                + left.toString()
+                + right.toString()));
         print(
                 "Wrote file at " + file + " in "
                 + (System.currentTimeMillis() - start) + " ms");
     }
 
+    /**
+     * Reset for a new path.
+     */
     public void reset() {
         timeSegments = new SegmentGroup();
         left = new SegmentGroup();
@@ -447,6 +457,9 @@ public final class ContinuousPath {
      * Makes a simple linear function to solve for all values of the segment at
      * any point t within [a.time, b.time]. Not very useful for little gaps,
      *  useful for big jumps.
+     * 
+     * Not implemented yet.  I'll likely use Line.java, and add an
+     * evaluate at point method.
      *
      * @param a The segment before.
      * @param b The segment after.

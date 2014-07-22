@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package autonomousplanner.geometry;
 
@@ -18,7 +13,7 @@ public class SegmentGroup {
     
     /**
      * Puts together all of the toString() methods for every segment.
-     * Used for debugging to view output data on graphs.
+     * Used for file output.
      * @return
      */
     @Override
@@ -27,8 +22,8 @@ public class SegmentGroup {
         for(int i = 0; i < s.size(); i+=1){
             //str = str + s.get(i).toString() + '\n';
             Segment a = s.get(i);
-            str += String.format("%4f %4f %4f %4f %4f %4f %4f %4f %4f \n" , 
-                     a.time,  a.vel, a.acc, a.posit, a.x, a.y, a.dydx, a.d2ydx2, a.jerk);
+            str += String.format("%4f %4f %4f %4f %4f %4f %4f %4f  \n" , 
+                     a.time,  a.vel, a.acc, a.posit, a.x, a.y, a.dydx, a.d2ydx2);
         }
         return str;
     }
@@ -43,6 +38,10 @@ public class SegmentGroup {
         }
     }
     
+    /**
+     * Add a segment to the end of the segment group.
+     * @param ss
+     */
     public void add(Segment ss){
         s.add(ss);
     }

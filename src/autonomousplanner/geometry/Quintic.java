@@ -34,6 +34,7 @@ public class Quintic implements Spline {
      * Creates a relaxed Spline with these parameters. This is not a parametric
      * spline! Parametric splines need separate dy/dt, dx/dt, and dy/dx for each
      * endpoint. It's difficult to find values that result in a smooth spline.
+     * See Parametric Quintic.
      *
      * @param x0
      * @param y0
@@ -136,6 +137,10 @@ public class Quintic implements Spline {
         }
     }
     
+    /**
+     * A high resolution spline calculation.
+     * Currently not used?
+     */
     public void getBigScaledPoints() {
         distancep = 10000;
         //go from 1 to 1000 little tiny steps.
@@ -146,6 +151,7 @@ public class Quintic implements Spline {
             yList.add(evaluateSpline((double) i / distancep) * d_x);
         }
     }
+    
     /**
      * Get all the segments!
      * @return 
@@ -201,11 +207,20 @@ public class Quintic implements Spline {
         editSpline(x0, y0, 0, x1, y1, 0);
     }
     
-     @Override
+    /**
+     * For the editor, set the index of the waypoint where this spline begins.
+     * Used for the spline search/calculation order.
+     * @param i
+     */
+    @Override
     public void setStartingWaypointIndex(int i) {
         index = i;
     }
 
+    /**
+     * The index of the waypoint where the spline starts.
+     * @return
+     */
     @Override
     public int getWaypointIndex() {
         return index;
@@ -256,26 +271,49 @@ public class Quintic implements Spline {
         return "Quintic";
     }
     
+    /**
+     * The spline ID.  Not used right now.
+     * @return
+     */
     @Override
     public int splineID() {
         return ID;
     }
 
+    /**
+     * Set spline ID.  Used to help order splines.
+     * @param id
+     */
     @Override
     public void setSplineID(int id) {
         this.ID = id;
     }
 
+    /**
+     * This is not a parametric spline.
+     * Don't use this method.
+     * @param isY
+     * @return
+     */
     @Override
     public SegmentGroup getParametricData(boolean isY) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Normal quintic splines can't be flipped.
+     * Always returns false and uses default calculation order every time.
+     * @return
+     */
     @Override
     public boolean isFlipped() {
         return false;
     }
 
+    /**
+     * Does nothing.  Cannot be flipped.
+     * @param isFlipped
+     */
     @Override
     public void setFlipped(boolean isFlipped) {
     }

@@ -10,7 +10,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 /**
- * Basic window.
+ * Basic window.  Start a new path, or view an existing one.
  * @author Jared
  */
 public class StartWindow extends javax.swing.JFrame {
@@ -48,6 +48,11 @@ public class StartWindow extends javax.swing.JFrame {
         });
 
         jButton2.setText("Load Auto...");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Spline Tests");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -99,6 +104,11 @@ public class StartWindow extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         SplineTest.main(null);        // TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        new OpenFile().setVisible(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments

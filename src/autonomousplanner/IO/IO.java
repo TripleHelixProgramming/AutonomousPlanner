@@ -18,6 +18,7 @@ public class IO {
     /**
      * Write a string to a file at the given path. If the file does not exist,
      * the file is created.
+     * From team 254.
      *
      * @param path The location of the file to write.
      * @param string The data to write.
@@ -28,7 +29,7 @@ public class IO {
             File f = new File(path);
 
             if (!f.exists()) {
-                boolean createNewFile = f.createNewFile();
+                f.createNewFile();
             }
             FileWriter fr = new FileWriter(f.getAbsoluteFile());
             try (BufferedWriter br = new BufferedWriter(fr)) {
@@ -42,7 +43,7 @@ public class IO {
 
     /**
      * Write a string to a file.
-     *
+     * From 254.
      * @param f
      * @param string
      */
@@ -75,7 +76,7 @@ public class IO {
 
     /**
      * Create a path for a file in a folder.
-     *
+     * From 254.
      * @param folder
      * @param file
      * @return The path.

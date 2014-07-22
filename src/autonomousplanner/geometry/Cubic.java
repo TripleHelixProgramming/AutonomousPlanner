@@ -44,6 +44,9 @@ public class Cubic implements SplineGroup {
         }
     }
 
+    /**
+     * Generate the polynomial
+     */
     public void generatePoly() {
         //compute hermite splines using bezier control points and user start/end points.
         int x1, y1, x2, y2;
@@ -259,62 +262,7 @@ public class Cubic implements SplineGroup {
         return dy/dx;
     }
     
-      /**
-     * Is it 1st/2nd derivative continuous at the end?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtEnd() {
-        return false;
-    }
-    /**
-     * Is it 1st/2nd derivative continuous at the beginning?.
-     * True if endpoint.
-     * @return 
-     */
-    @Override
-    public boolean isContinuousAtBeginning() {
-        return false;
-    }
-
-    /**
-     * Is the left end the absolute end?.
-     * Left means first point, not leftmost.
-     * @return
-     */
-    @Override
-    public boolean leftEndIsAbsoluteEnd() {
-        return leftAbsEnd;
-    }
-
-    /**
-     * Is the right end the absolute end?.
-     * Right means last, not rightmost.
-     * @return
-     */
-    @Override
-    public boolean rightEngIsAbsoluteEnd() {
-        return rightAbsEnd;
-    }
-
-    /**
-     * Set first point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setLeftEndAbsolute(boolean isAbsolute) {
-        leftAbsEnd = isAbsolute;
-    }
-
-    /**
-     * Set last point sequence start.
-     * @param isAbsolute
-     */
-    @Override
-    public void setRightEndAbsolute(boolean isAbsolute) {
-        rightAbsEnd = isAbsolute;
-    }
+  
     
     @Override
     public int splineID() {

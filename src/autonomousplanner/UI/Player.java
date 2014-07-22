@@ -2,6 +2,7 @@
 package autonomousplanner.UI;
 
 import autonomousplanner.ContinuousPath;
+import autonomousplanner.geometry.RobotSegmentGroup;
 import autonomousplanner.geometry.SegmentGroup;
 import java.awt.Graphics;
 import java.util.Timer;
@@ -35,6 +36,22 @@ public class Player extends TimerTask {
 		//start timertask to repaint the Draw window
         timer.scheduleAtFixedRate(this, 0, 20);
     }
+    
+    /**
+     * View path from a segment group group.
+     * @param s
+     */
+    public Player(RobotSegmentGroup s){
+        window = new JFrame();
+		//make window go away when closed
+        window.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        window.setBounds(30, 30, 800, 800);
+        test = new Window(s.robot, s.right, s.left);
+        window.getContentPane().add(test);
+        window.setVisible(true);
+		//start timertask to repaint the Draw window
+        timer.scheduleAtFixedRate(this, 0, 20);
+    }
 
     /**
      * Repaint the window
@@ -48,7 +65,10 @@ public class Player extends TimerTask {
        this.window.setVisible(false);
     }
 }
-
+/**
+ * The display window for player.
+ * @author Jared
+ */
 class Window extends JComponent {
 
     double i;
@@ -80,7 +100,11 @@ class Window extends JComponent {
                     (int) (l.s.get(j).y * 15 + (27 * 15)), 1, 1);
         }
     }
-
+    /**
+     * The paint method for the window.  Gets provided the graphics
+     * object to draw the path.
+     * @param g 
+     */
     @Override
     public void paintComponent(Graphics g) {
         boolean isAutomated = true;

@@ -2,7 +2,7 @@
 package autonomousplanner.geometry;
 
 /**
- * A group of splines!
+ * A group of splines!  Currently used only for the piecewise cubic spline.
  * @author Jared
  */
 public interface SplineGroup {
@@ -13,12 +13,7 @@ public interface SplineGroup {
     public void setStartingIndex(int i);
     public double getStartDYDX();
     public double getEndDYDX();
-    public boolean isContinuousAtEnd();
-    public boolean isContinuousAtBeginning();
-    public boolean leftEndIsAbsoluteEnd();
-    public boolean rightEngIsAbsoluteEnd();
-    public void setLeftEndAbsolute(boolean isAbsolute);
-    public void setRightEndAbsolute(boolean isAbsolute);
+  
     public int splineID();
     public void setSplineID(int id);
 }
