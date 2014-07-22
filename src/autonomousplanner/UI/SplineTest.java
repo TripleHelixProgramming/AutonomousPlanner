@@ -17,6 +17,7 @@ public class SplineTest extends javax.swing.JFrame {
      */
     public SplineTest() {
         initComponents();
+        setTitle("Spline Test");
     }
 
     /**

@@ -24,6 +24,7 @@ public class OpenFile extends javax.swing.JFrame {
     public OpenFile() {
         initComponents();
         this.setLocation(600, 100);
+        setTitle("Open a path file...");
     }
 
     /**

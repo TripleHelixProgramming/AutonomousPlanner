@@ -20,6 +20,7 @@ public class StartWindow extends javax.swing.JFrame {
      */
     public StartWindow() {
         initComponents();
+        setTitle("Autonomous Planner");
     }
 
     /**

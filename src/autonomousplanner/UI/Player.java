@@ -43,6 +43,7 @@ public class Player extends TimerTask {
      */
     public Player(RobotSegmentGroup s){
         window = new JFrame();
+        window.setTitle("Path Player");
 		//make window go away when closed
         window.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         window.setBounds(30, 30, 800, 800);
@@ -70,6 +71,7 @@ public class Player extends TimerTask {
  * @author Jared
  */
 class Window extends JComponent {
+    SpeedSlider slider = new SpeedSlider();
 
     double i;
     SegmentGroup s, r, l;
@@ -79,6 +81,7 @@ class Window extends JComponent {
     public Window(SegmentGroup s, SegmentGroup r, SegmentGroup l) {
         this.s=s;
         this.r = r;
+        slider.setVisible(true);
         this.l = l;
     }
     /**
@@ -144,9 +147,9 @@ class Window extends JComponent {
             g.drawOval((int) x - 40+ k_left, (int) y - 40, 80, 80);
 			//automatically increment to next frame if auto playing
             if(isAutomated){
-            i += 0.5;
+            i += slider.getPlayRate();
 			//restart if needed.
-            if (i > s.s.size()- 0.1) {
+            if (i > s.s.size()- slider.getPlayRate()) {
                 i = 0;
             }
             }

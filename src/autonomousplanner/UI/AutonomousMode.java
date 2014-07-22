@@ -60,6 +60,7 @@ public class AutonomousMode extends TimerTask {
         startPoint = new Point(x, y);
         startPoint.setHeading(h);
         jf = new JFrame();
+        jf.setTitle("Editor");
         jf.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         jf.setBounds(120, 30, 800, 800);
         jf.setLocation(400, 50);//consider making bigger
@@ -658,6 +659,8 @@ public class AutonomousMode extends TimerTask {
          * @return
          */
         public SegmentGroup joinSplines() {
+            long startTime = System.currentTimeMillis();
+            System.out.println("Sorting and joining Splines...");
             SegmentGroup s = new SegmentGroup();
             recalculateAllSplines(splines, sGroups, HIGH_RES);
             printl(currentID + " curr Id");
@@ -713,7 +716,7 @@ public class AutonomousMode extends TimerTask {
                     }
                 }
             }
-
+            System.out.println("Done! In " + (System.currentTimeMillis()-startTime) + " ms.");
             return s;
         }
 

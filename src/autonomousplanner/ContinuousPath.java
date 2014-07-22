@@ -90,6 +90,7 @@ public final class ContinuousPath {
                 t1 = pathSegments.s.get(i - 1).x;
                 //the change in the first derivative over the change in x
                 pathSegments.s.get(i).d2ydx2 = ((d2 - d1) / (t2 - t1));
+                
             }
         }
     }
@@ -115,7 +116,7 @@ public final class ContinuousPath {
      * Limit the velocity on all points.
      */
     public void limitVelocity() {
-        print("     Limiting Velocity Part 1/2");
+        print("     Limiting Velocity to Robot Maximum...");
         for (int i = 0; i < pathSegments.s.size(); i++) {
             if (pathSegments.s.get(i).vel > max_vel) {
                 pathSegments.s.get(i).vel = max_vel;
@@ -177,7 +178,7 @@ public final class ContinuousPath {
     public void calculateVelocity() {
         pathSegments.s.get(0).vel = 0; //not moving at beginning
         pathSegments.s.get(pathSegments.s.size() - 1).vel = 0; //or end
-        print("     Limiting Velocity Part 2/2");
+        print("     Calculating time related values...");
         double minAcc;
         double maxAcc;
         double tSum = 0;
@@ -187,9 +188,9 @@ public final class ContinuousPath {
         //max_vel^2 = 2*a*dx
         //max_vel^2/(2*a) = dx
         double stopDX = max_vel * max_vel / (2 * max_acc);
-        System.out.println("Stopping Distance " + stopDX);
+        System.out.println("     Calculated minimum stopping distance " + stopDX);
         double stopPosit = path.length - stopDX;
-        System.out.println(stopPosit + " place");
+        //System.out.println(stopPosit + " place");
         for (int i = 1; i < pathSegments.s.size() - 1; i++) {
             //find change in position.
             double dx = pathSegments.s.get(i).posit - pathSegments.s.get(i - 1).posit;
@@ -283,8 +284,8 @@ public final class ContinuousPath {
         }
 
         double totalTime = tTotal3 + tTotal2;
+        System.out.println("     Done calculating velocity");
         print("     Time to drive spline: " + totalTime);
-        print("     Was written to file?  ");
 
     }
 
@@ -336,6 +337,7 @@ public final class ContinuousPath {
      *Recalculate values.  A double check of my previous math.
      */
     public void recalculateValues() {
+        System.out.println("     Verifying values");
         for (int i = 0; i < timeSegments.s.size(); i++) {
             if (i != 0) {
                 Segment now = timeSegments.s.get(i);
@@ -353,6 +355,7 @@ public final class ContinuousPath {
      * recalculate all values for the new path.
      */
     public void splitLeftRight() {
+        System.out.println("     Generating paths for robot sides");
         for (int i = 0; i < timeSegments.s.size(); i++) {
             //left.
             Segment s = timeSegments.s.get(i);

@@ -20,6 +20,7 @@ public class SaveFile extends javax.swing.JFrame {
         this.bot = bot;
         initComponents();
         this.setLocation(600, 100);
+        setTitle("Save a path file...");
     }
 
     /**

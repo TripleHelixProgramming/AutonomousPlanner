@@ -22,6 +22,8 @@ public class ParametricQuintic implements Spline {
     boolean isFlipped = true;
     public double curveSize = 100;
             boolean canRecalculate = true;
+            public boolean headingSlider = false, headingSlider2;
+            public double sliderHeading = 0 , sliderHeading2 = 1;
 
     /**
      * Create a new parametric quintic spline.  
@@ -91,6 +93,8 @@ public class ParametricQuintic implements Spline {
        
         return output;
     }
+    
+    
 
     /**
      * Calculate both xt and yt splines.
@@ -164,8 +168,7 @@ public class ParametricQuintic implements Spline {
      * but fixed values.
      * @param dydx
      */
-    @Override
-    public void setStartDYDX(double dydx) {
+    public void setSDYDX(double dydx) {
         //dy/dx of parametric thing is (dy/dt)/(dx/dt)
         //to make things easier, I'll make dt = 0
         //this means that dy/dt = dy/dx
@@ -188,8 +191,7 @@ public class ParametricQuintic implements Spline {
      * but fixed values.
      * @param dydx
      */
-    @Override
-    public void setEndDYDX(double dydx) {
+    public void setEDYDX(double dydx) {
         if (isFlipped) {
             yt.setStartDYDX(curveSize * dydx);
             xt.setStartDYDX(curveSize);
@@ -262,5 +264,25 @@ public class ParametricQuintic implements Spline {
     public void setFlipped(boolean isFlipped) {
         this.isFlipped = isFlipped;
     }
+
+    @Override
+    public void setStartDYDX(double dydx) {
+        if(headingSlider){
+            setSDYDX(sliderHeading);
+        }else{
+            setSDYDX(dydx);
+        }
+    }
+
+    @Override
+    public void setEndDYDX(double dydx) {
+        if(headingSlider2){
+            setEDYDX(sliderHeading2);
+        } else {
+            setEDYDX(dydx);
+        }
+    }
+    
+    
 
 }

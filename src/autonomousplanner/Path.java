@@ -95,6 +95,7 @@ public class Path {
      * @return the length
      */
     public double calculateLength() {
+        System.out.println("     Calculating Length...");
         //make a bunch of lines between points, then connect the dots.
         long start = System.currentTimeMillis();
         for (int i = 1; i < x.size(); i++) {
@@ -155,6 +156,7 @@ public class Path {
      * Not used currently
      */
     public void walkSpline() {
+        System.out.println("     Dividing Segments...");
         long start = System.currentTimeMillis();
         double segLength = length / numberOfSegments;
         print("     Segment Length: " + segLength);
