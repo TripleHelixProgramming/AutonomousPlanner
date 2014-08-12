@@ -32,9 +32,10 @@ public class IO {
                 f.createNewFile();
             }
             FileWriter fr = new FileWriter(f.getAbsoluteFile());
-            try (BufferedWriter br = new BufferedWriter(fr)) {
-                br.write(string);
-            }
+//            try (BufferedWriter br = new BufferedWriter(fr)) {
+//                br.write(string);
+//            }
+            new BufferedWriter(fr).write(string);
         } catch (IOException e) {
             return false;
         }
@@ -58,9 +59,10 @@ public class IO {
                 }
             }
             fr = new FileWriter(f.getAbsoluteFile());
-            try (BufferedWriter br = new BufferedWriter(fr)) {
-                br.write(string);
-            }
+//            try (BufferedWriter br = new BufferedWriter(fr)) {
+//                br.write(string);
+//            }
+            new BufferedWriter(fr).write(string);
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
