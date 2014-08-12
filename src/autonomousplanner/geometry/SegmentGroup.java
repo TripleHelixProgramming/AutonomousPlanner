@@ -25,6 +25,7 @@ public class SegmentGroup {
             str += String.format("%4f %4f %4f %4f %4f %4f %4f %4f  \n" , 
                      a.time,  a.vel, a.acc, a.posit, a.x, a.y, a.dydx, a.d2ydx2);
         }
+        //System.out.println(str);
         return str;
     }
 

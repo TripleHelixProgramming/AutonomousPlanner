@@ -35,7 +35,9 @@ public class IO {
 //            try (BufferedWriter br = new BufferedWriter(fr)) {
 //                br.write(string);
 //            }
-            new BufferedWriter(fr).write(string);
+            BufferedWriter write = new BufferedWriter(fr);
+            write.write(string);
+            write.close();
         } catch (IOException e) {
             return false;
         }
@@ -49,6 +51,7 @@ public class IO {
      * @param string
      */
     public static void writeFile(File f, String string) {
+        //System.out.println(string);
         FileWriter fr = null;
         try {
             if (!f.exists()) {
@@ -62,7 +65,10 @@ public class IO {
 //            try (BufferedWriter br = new BufferedWriter(fr)) {
 //                br.write(string);
 //            }
-            new BufferedWriter(fr).write(string);
+            BufferedWriter write = new BufferedWriter(fr);
+            write.write(string);
+            write.close();
+            
         } catch (IOException ex) {
             Logger.getLogger(IO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {

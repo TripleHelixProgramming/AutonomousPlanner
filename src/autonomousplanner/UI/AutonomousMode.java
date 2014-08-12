@@ -119,7 +119,7 @@ public class AutonomousMode extends TimerTask {
             } catch (IOException ex) {
                 System.out.println(ex);
             }
-            g.drawImage(img, 0, 0, null);
+            //g.drawImage(img, 0, 0, null);
             //origin
             g.drawOval(250 - 5, 250 - 5, 10, 10);
             //last click

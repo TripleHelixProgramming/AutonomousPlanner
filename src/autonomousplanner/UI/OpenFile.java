@@ -3,6 +3,8 @@ package autonomousplanner.UI;
 
 
 import autonomousplanner.ContinuousPath;
+import autonomousplanner.DumbFollower;
+import autonomousplanner.GraphicalFollower;
 import autonomousplanner.Util;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -74,6 +76,9 @@ public class OpenFile extends javax.swing.JFrame {
             //bot.savePath(jFileChooser1.getSelectedFile().getAbsoluteFile());
             try {
                 new Player(Util.stringToPath236(Util.readStringFromFile(jFileChooser1.getSelectedFile())));
+                GraphicalFollower g = new GraphicalFollower();
+                g.setVisible(true);
+                new DumbFollower(Util.stringToPath236(Util.readStringFromFile(jFileChooser1.getSelectedFile())), g);
             } catch (IOException ex) {
                 Logger.getLogger(OpenFile.class.getName()).log(Level.SEVERE, null, ex);
             }
