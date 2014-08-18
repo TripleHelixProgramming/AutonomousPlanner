@@ -1,4 +1,3 @@
-
 package autonomousplanner;
 
 import autonomousplanner.IO.IO;
@@ -9,8 +8,8 @@ import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
 /**
- * Does math involving time, acceleration, velocity, and jerk. Splits
- * into segments of equal time length.
+ * Does math involving time, acceleration, velocity, and jerk. Splits into
+ * segments of equal time length.
  *
  * @author Team 236
  */
@@ -90,7 +89,7 @@ public final class ContinuousPath {
                 t1 = pathSegments.s.get(i - 1).x;
                 //the change in the first derivative over the change in x
                 pathSegments.s.get(i).d2ydx2 = ((d2 - d1) / (t2 - t1));
-                
+
             }
         }
     }
@@ -110,8 +109,6 @@ public final class ContinuousPath {
 
     }
 
-   
-
     /**
      * Limit the velocity on all points.
      */
@@ -123,169 +120,54 @@ public final class ContinuousPath {
             }
         }
     }
-
-    /**
-     * Slows down robot at the end of the path.
-     * Currently not used.
-     */
-    private void setEndVelocity() {
-        double vLast = 0;
-        print("     Adjusting velocity for path end.");
-        double adjustNum = 0; //number of adjusted segments.
-        ArrayList<Segment> s = pathSegments.s;
-        //backward for loop to start at end with velocity
-        //and acceleration equal to zero, then increase by stepping
-        //backward through the path
-        for (int i = s.size() - 2; i >= 0; i--) {
-            if (i == s.size() - 2) {
-                //last segment, set stuff to zero
-                s.get(i).acc = 0;
-                s.get(i).vel = 0;
-                s.get(i).jerk = 0;
-            } else {
-
-                double dx = -s.get(i).posit + s.get(i + 1).posit;
-                //vf^2  = 2adx + v0^2
-                double vf = Math.sqrt(2 * max_acc * s.get(i).dx + vLast * vLast);
-                //vf = (s.get(i+1).vel + dx);
-                double segmentVelocity = vf;
-                if (s.get(i + 1).vel < 2) {
-                    segmentVelocity = vf;
-                    //System.out.println(vf);
-                }
-                adjustNum++;//increment number of adjusted segments.
-                if (segmentVelocity > s.get(i).vel) {
-                    //LOOK, I'M USING BREAK!!!!
-                    //if we've back up far enough so that we're
-                    //going faster than the original speed,
-                    //we've met our goal of slowing the robot at the end, and we
-                    //can quit.
-                    break;
-                }
-                //set the velocity.
-                s.get(i).vel = vf;
-                vLast = vf;
-            }
-
-        }
-        print("     Adjusted " + adjustNum + " points.");
-    }
-
     /**
      * Calculates the velocity at every point. Keeping in mind jerk,
      * acceleration, and velocity limits.
      */
     public void calculateVelocity() {
-        pathSegments.s.get(0).vel = 0; //not moving at beginning
-        pathSegments.s.get(pathSegments.s.size() - 1).vel = 0; //or end
-        print("     Calculating time related values...");
-        double minAcc;
-        double maxAcc;
-        double tSum = 0;
-
-        //figure out the farthest back where we need to start stopping.
-        //vf^0 = v0^2 + 2adx.
-        //max_vel^2 = 2*a*dx
-        //max_vel^2/(2*a) = dx
-        double stopDX = max_vel * max_vel / (2 * max_acc);
-        System.out.println("     Calculated minimum stopping distance " + stopDX);
-        double stopPosit = path.length - stopDX;
-        //System.out.println(stopPosit + " place");
-        for (int i = 1; i < pathSegments.s.size() - 1; i++) {
-            //find change in position.
-            double dx = pathSegments.s.get(i).posit - pathSegments.s.get(i - 1).posit;
-            //set minimum and maximum acceleration
-            maxAcc = max_acc;
-            minAcc = -max_dcc;
-            //if we're out of bounds for acceleration, limit it!
-            if (pathSegments.s.get(i - 1).acc > max_acc) {
-                maxAcc = pathSegments.s.get(i - 1).acc;
-            }
-            if (pathSegments.s.get(i - 1).acc < -max_dcc) {
-                minAcc = pathSegments.s.get(i - 1).acc;
-            }
-            //minAcc = -40;
-            //how fast were we going previously?
-            double lastVel = pathSegments.s.get(i - 1).vel;
-            //how fast do we want to go?
-            double desVelocity = pathSegments.s.get(i).vel;
-            //pathSegments.s.get(i).jerk = desVelocity;
-            //we want to speed up.
-            //but can we do it this quickly in this short of a distance?
-            //vf^2 = v0^2 + 2adx
-            //remember, lastVel is final, but desVel can be changed.
-            //how far will we go?
-            //differences of squares
-            double potato = (desVelocity * desVelocity) - (lastVel * lastVel);
-            //divide by 2*dx
-            //this is our desired acceleration
-            double a = potato / (2 * dx);
-            //do stop check
-            boolean canStop = true;
-            double distanceLeft;
-            distanceLeft = path.length - pathSegments.s.get(i).posit;
-            if(lastVel * lastVel / (2 * max_acc) > distanceLeft){
-                canStop = false;
-            }
-            if (!canStop) {
-                //we need to stop now
-                a = -9.999;
-
-            }
-            
-            //is it within our limits?
-            if ((minAcc < a) && (maxAcc > a)) {
-                //yes.  we can accelerate this fast. !!!
-                //how much seconds does it take to do this?
-                //dv/dt = a
-                //dv/a = t.
-                //vf^2 = v0^2 + 2adx
-                
-                double p = 2*a*pathSegments.s.get(i).dx + lastVel*lastVel;
-                //desVelocity = Math.sqrt(p);
-                desVelocity = Math.min(Math.sqrt(p), desVelocity);
-                double time = (dx) / (desVelocity);
-                pathSegments.s.get(i).jerk = desVelocity;
-                pathSegments.s.get(i).dt = time;
-                pathSegments.s.get(i).acc = a;
-                tTotal2 += time; //keep track of time
-                tSum += time;
-                pathSegments.s.get(i).time = tSum;
-                double dv = a * time;
-                pathSegments.s.get(i).vel = dv + pathSegments.s.get(i - 1).vel;
-                //leave velocity the way it is.
-            } else {
-
-                //no. we cannot accelerate this fast ): !!!
-                //so, if we were to accelerate as fast as possible
-                //how fast would we go?
-                //using vf = sqrt (v0^2 + 2ax)
-                double vf;
-                //pathSegments.s.get(i).jerk = desVelocity;
-                //pick logically whether we want to go quickly or slowly.
-                if (lastVel < desVelocity) {
-                    vf = Math.sqrt((lastVel * lastVel) + 2 * maxAcc * dx);
-                } else {
-                    vf = Math.sqrt((lastVel * lastVel) + 2 * minAcc * dx);
-
-                }
-                //how long does that take?
-                //vf = v0 + at
-                //(vf-v0)/a = t
-                double time = (2 * dx) / (vf + lastVel);
-                pathSegments.s.get(i).vel = vf;
-                pathSegments.s.get(i).dt = time;
-                //calculate the actual acceleration wrt time
-                pathSegments.s.get(i).acc = (vf - lastVel) / time;
-                tSum += time; //keep track of time
-                pathSegments.s.get(i).time = tSum;
-                tTotal3 += time;
+        ArrayList<Segment> p = pathSegments.s;
+        for (int i = 1; i < p.size(); i++) {
+            if (p.get(i).dx == 0) {
+                p.remove(i);
             }
         }
+        p.get(0).vel = 0;
+        double time = 0;
+        for (int i = 1; i < p.size(); i++) {
+            //what is the maximum our v_f can be?
+            //sqrt(v_0^2 + 2*a_max*dx)
+            double v_0 = p.get(i - 1).vel;
+            double dx = p.get(i - 1).dx;
+            if (dx != 0) {
+                double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_acc * dx));
+                double v = Math.min(v_max, p.get(i).vel);
+                if(Double.isNaN(v)){
+                    v = 0;
+                }
+                p.get(i).vel = v;
+            } else {
+                p.get(i).vel = p.get(i - 1).vel;
+            }
+        }
+        p.get(p.size() - 1).vel = 0;
+        for (int i = p.size() - 2; i > 1; i--) {
+            double v_0 = p.get(i + 1).vel;
+            double dx = p.get(i + 1).dx;
+            double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_dcc * dx));
+            double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), p.get(i).vel);
+            p.get(i).vel = v;
+        }
+        for (int i = 1; i < p.size(); i++) {
+            double v = p.get(i).vel;
+            double dx = p.get(i - 1).dx;
+            double v_0 = p.get(i - 1).vel;
+            time = time + (2 * dx) / (v + v_0);
+            time = (Double.isNaN(time)) ? 0 : time;
+            p.get(i).time = time;
+        }
 
-        double totalTime = tTotal3 + tTotal2;
-        System.out.println("     Done calculating velocity");
-        print("     Time to drive spline: " + totalTime);
+
+
 
     }
 
@@ -312,12 +194,11 @@ public final class ContinuousPath {
                 //dt will need to be updated
                 //look at the last and second to last time segments to 
                 //compute dt
-                double newDT
-                        = timeSegments.s.get(timeSegments.s.size() - 1).time
+                double newDT = timeSegments.s.get(timeSegments.s.size() - 1).time
                         - timeSegments.s.get(timeSegments.s.size() - 2).time;
                 //put dt in the time segment
                 timeSegments.s.get(timeSegments.s.size() - 1).dt = newDT;
-                timeSegments.s.get(timeSegments.s.size() - 1).jerk = pathSegments.s.get(i).jerk;
+                //timeSegments.s.get(timeSegments.s.size() - 1).jerk = pathSegments.s.get(i).jerk;
                 //find out if we have a messy segment
                 if (Math.abs(pathSegments.s.get(i).time - segmentTime(segNum)) > 0.0105) {
                     numMessySeg++;
@@ -334,7 +215,7 @@ public final class ContinuousPath {
     }
 
     /**
-     *Recalculate values.  A double check of my previous math.
+     * Recalculate values. A double check of my previous math.
      */
     public void recalculateValues() {
         System.out.println("     Verifying values");
@@ -342,17 +223,16 @@ public final class ContinuousPath {
             if (i != 0) {
                 Segment now = timeSegments.s.get(i);
                 Segment past = timeSegments.s.get(i - 1);
-                now.vel = (now.posit - past.posit) / now.dt;
-                now.acc = (now.vel - past.vel) / now.dt;
+                now.vel = (now.posit - past.posit) / (now.time - past.time);
+                now.acc = (now.vel - past.vel) / (now.time - past.time);
             }
         }
     }
 
     /**
      * Split a single robot path into paths for separate sides. Math taken from
-     * Team 254's 2014 Code.
-     * Relocate x and y based off of robot width and robot angle, then
-     * recalculate all values for the new path.
+     * Team 254's 2014 Code. Relocate x and y based off of robot width and robot
+     * angle, then recalculate all values for the new path.
      */
     public void splitLeftRight() {
         System.out.println("     Generating paths for robot sides");
@@ -420,8 +300,8 @@ public final class ContinuousPath {
     public void savePath(File file) {
         long start = System.currentTimeMillis();
         print("Writing file...");
-        IO.writeFile(file, ("Potato" + '\n' + timeSegments.s.size() + '\n' + 
-                timeSegments.toString()
+        IO.writeFile(file, ("Potato" + '\n' + timeSegments.s.size() + '\n'
+                + timeSegments.toString()
                 + left.toString()
                 + right.toString()));
         print(
@@ -446,6 +326,7 @@ public final class ContinuousPath {
      * @param s segment to calculate
      * @return radius (in feet)
      */
+    
     private double radiusOfCurvature(Segment s) {
         //formula off the interent.
         double b, c, r;
@@ -459,10 +340,10 @@ public final class ContinuousPath {
     /**
      * Makes a simple linear function to solve for all values of the segment at
      * any point t within [a.time, b.time]. Not very useful for little gaps,
-     *  useful for big jumps.
-     * 
-     * Not implemented yet.  I'll likely use Line.java, and add an
-     * evaluate at point method.
+     * useful for big jumps.
+     *
+     * Not implemented yet. I'll likely use Line.java, and add an evaluate at
+     * point method.
      *
      * @param a The segment before.
      * @param b The segment after.
@@ -483,9 +364,8 @@ public final class ContinuousPath {
     private double segmentTime(int segNum) {
         return (segNum) * segmentTime;
     }
-    
-    public void print(Object o){
+
+    public void print(Object o) {
         System.out.println(o);
     }
-
 }

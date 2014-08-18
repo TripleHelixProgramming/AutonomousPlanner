@@ -123,16 +123,16 @@ class Window extends JComponent {
             g.drawRect(0, 0, 27 * 30, 27 * 30);
             
             g.drawChars("Velocity".toCharArray(), 0, 8, 40, 20);
-            g.drawChars((String.valueOf(s.s.get((int) i).vel).toCharArray()), 0, 3, 40, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).vel)).toCharArray()), 0, 3, 40, 40);
 
             g.drawChars("Accel".toCharArray(), 0, 5, 100, 20);
-            g.drawChars((String.valueOf(s.s.get((int) i).acc).toCharArray()), 0, 3, 100, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).acc)).toCharArray()), 0, 3, 100, 40);
 
             g.drawChars("Time".toCharArray(), 0, 4, 160, 20);
-            g.drawChars((String.valueOf(s.s.get((int) i).time).toCharArray()), 0, 3, 160, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).time)).toCharArray()), 0, 3, 160, 40);
 
             g.drawChars("Distance".toCharArray(), 0, 8, 220, 20);
-            g.drawChars((String.valueOf(s.s.get((int) i).posit).toCharArray()), 0, 3, 220, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).posit)).toCharArray()), 0, 3, 220, 40);
 
             //draw line that indicates heading
             g.drawLine((int) x+ k_left, (int) (y + (0)), (int) (100 * Math.cos(theta) + x)+ k_left, (int) (100 * Math.sin(theta) + y + (0)));
@@ -153,6 +153,10 @@ class Window extends JComponent {
                 i = 0;
             }
             }
+    }
+    
+    public double roundToHundreths(double in){
+       return Math.round(in * 100.0) / 100.0;
     }
 
 }
