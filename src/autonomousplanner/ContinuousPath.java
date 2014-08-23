@@ -42,13 +42,14 @@ public final class ContinuousPath {
             max_acc = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Acceleration.  Input nothing to use defaults", "Path", JOptionPane.PLAIN_MESSAGE));
             max_dcc = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Deceleration", "Path", JOptionPane.PLAIN_MESSAGE));
             width = Double.valueOf(JOptionPane.showInputDialog(null, "Robot Width, feet", "Waypoint", JOptionPane.PLAIN_MESSAGE));
-
+            max_jerk = Util.messageBoxDouble("Maximum Jerk", "Path");
             max_vel = Double.valueOf(JOptionPane.showInputDialog(null, "Maximum Velocity", "Path", JOptionPane.PLAIN_MESSAGE));
         } catch (NumberFormatException ex) {
             max_acc = 10;
             max_dcc = 10;
             width = 2;
             max_vel = 10;
+            max_jerk = 20; //is this okay?
             print("Input format error.  Using default robot values");
         }
         print(" ");
@@ -63,9 +64,10 @@ public final class ContinuousPath {
         limitVelocity();
         //setEndVelocity();
         calculateVelocity();
+        //doJerkStuff();
         splitGroupByTime();
-        recalculateValues();
-        splitLeftRight();
+        //recalculateValues();
+        //splitLeftRight();
         print("ROBOT CALCULATE TIME: " + (System.currentTimeMillis() - start));
 
     }
@@ -103,8 +105,11 @@ public final class ContinuousPath {
         //a = v^2/r
         //sqrt(ar) = v
         for (int i = 0; i < path.group.s.size(); i++) {
-            double v = Math.sqrt(max_acc * radiusOfCurvature(pathSegments.s.get(i)));
-            pathSegments.s.get(i).vel = v;
+            double r = radiusOfCurvature(pathSegments.s.get(i));
+            double v_max_curve = Math.sqrt(max_acc * r);
+            double big_r = r + width / 2;
+            double v_max_wheel = (r / big_r) * max_vel;
+            pathSegments.s.get(i).vel = Math.min(v_max_curve, Math.min(v_max_wheel, max_vel));
         }
 
     }
@@ -114,12 +119,13 @@ public final class ContinuousPath {
      */
     public void limitVelocity() {
         print("     Limiting Velocity to Robot Maximum...");
-        for (int i = 0; i < pathSegments.s.size(); i++) {
-            if (pathSegments.s.get(i).vel > max_vel) {
-                pathSegments.s.get(i).vel = max_vel;
-            }
-        }
+//        for (int i = 0; i < pathSegments.s.size(); i++) {
+//            if (pathSegments.s.get(i).vel > max_vel) {
+//                pathSegments.s.get(i).vel = max_vel;
+//            }
+//        }
     }
+
     /**
      * Calculates the velocity at every point. Keeping in mind jerk,
      * acceleration, and velocity limits.
@@ -141,8 +147,8 @@ public final class ContinuousPath {
             if (dx != 0) {
                 double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_acc * dx));
                 double v = Math.min(v_max, p.get(i).vel);
-                if(Double.isNaN(v)){
-                    v = 0;
+                if (Double.isNaN(v)) {
+                    v = p.get(i - 1).vel;
                 }
                 p.get(i).vel = v;
             } else {
@@ -157,6 +163,7 @@ public final class ContinuousPath {
             double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), p.get(i).vel);
             p.get(i).vel = v;
         }
+        
         for (int i = 1; i < p.size(); i++) {
             double v = p.get(i).vel;
             double dx = p.get(i - 1).dx;
@@ -164,11 +171,83 @@ public final class ContinuousPath {
             time = time + (2 * dx) / (v + v_0);
             time = (Double.isNaN(time)) ? 0 : time;
             p.get(i).time = time;
+            
         }
+        //get rid of no dt segs
+        for(int i = 1; i < p.size(); i++){
+            double dt = p.get(i).time - p.get(i-1).time;
+            if(dt == 0 || Double.isInfinite(dt)){
+                p.remove(i);
+            }
+        }
+        //reference calc of acc.
+        for(int i = 1; i <p.size(); i++){
+            double dv = p.get(i).vel - p.get(i-1).vel;
+            double dt = p.get(i).time - p.get(i-1).time;
+            if(dt == 0){
+                p.get(i).acc = 0;
+            }else{
+                p.get(i).acc = dv/dt;
+            }
+        }
+        Util.makeGraph(pathSegments, "test", "tet");
+    }
 
+    public void doJerkStuff() {
+        double time = 0;
+//        //calculate acceleration
+        ArrayList<Segment> p = pathSegments.s;
+        for (int i = 1; i < p.size(); i++) {
+            double dv = p.get(i).vel - p.get(i - 1).vel;
+            double dt = p.get(i).time - p.get(i - 1).vel;
+            p.get(i).acc = dv / dt;
+        }
+        //peform Jared Russell's method on acc/position curve.
+//        for (int i = 1; i < p.size(); i++) {
+//            double a_0 = p.get(i - 1).acc;
+//            double dx = p.get(i - 1).dx;
+//            if (dx != 0) {
+//                double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
+//                double a = Math.min(a_max, p.get(i).acc);
+//                if (Double.isNaN(a)) {
+//                    a = 0;
+//                }
+//                p.get(i).acc = a;
+//            } else {
+//                p.get(i).acc = 0;
+//            }
+//        }
 
-
-
+//        for (int i = p.size() - 2; i > 1; i--) {
+//            double a_0 = p.get(i + 1).acc;
+//            double dx = p.get(i + 1).dx;
+//            double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
+//            double a = Math.min((Double.isNaN(a_max) ? max_acc : a_max), p.get(i).acc);
+//            p.get(i).acc = a;
+//        }
+//        //recalculate velocity, using only dx and acceleration, as velocity
+//        //is max velocity with acc. limits, and may not always be achieved
+//        //with jerk limits in place.
+//        p.get(0).vel = 0;
+//        for (int i = 1; i < p.size(); i++) {
+//            double v_0 = p.get(i - 1).vel;
+//            double dx = p.get(i).posit - p.get(i - 1).posit;
+//            double a = (p.get(i).acc + p.get(i - 1).acc) / 2;
+//            a = (Double.isNaN(a)) ? 0 : a;
+//            double v_f = Math.sqrt(Math.abs(v_0 * v_0 + 2 * a * dx));
+//            p.get(i).vel = v_f;
+//            //System.out.println(v_f);
+//        }
+        //recalculate time
+//        for (int i = 1; i < p.size(); i++) {
+//            double v = p.get(i).vel;
+//            double dx = p.get(i - 1).dx;
+//            double v_0 = p.get(i - 1).vel;
+//            time = time + (2 * dx) / (v + v_0);
+//            time = (Double.isNaN(time)) ? 0 : time;
+//            p.get(i).time = time;
+//            //System.out.println(time);
+//        }
     }
 
     /**
@@ -227,6 +306,7 @@ public final class ContinuousPath {
                 now.acc = (now.vel - past.vel) / (now.time - past.time);
             }
         }
+        Util.makeGraph(timeSegments, "Step 1", "acceleration");
     }
 
     /**
@@ -243,15 +323,6 @@ public final class ContinuousPath {
             ArrayList<Segment> lg = left.s;
             left.s.add(l);
             l = left.s.get(i);
-//            double adjustedSine;
-//            double adjustedCosine;
-//            if(s.dydx > 1000){
-//                adjustedSine = 1;
-//                adjustedCosine = 0;
-//            }else{
-//                adjustedSine = Math.sin(Math.tan(s.dydx));
-//                adjustedCosine = Math.cos(Math.tan(s.dydx));
-//            }
             l.x = s.x - width / 2 * Math.sin(Math.atan(s.dydx));
             l.y = s.y + width / 2 * Math.cos(Math.atan(s.dydx));
 
@@ -281,9 +352,6 @@ public final class ContinuousPath {
                         * (r.y - rg.get(i - 1).y));
                 r.posit = rg.get(i - 1).posit + dp;
                 r.vel = dp / s.dt;
-                if (r.vel > 15) {
-                }
-                //r.vel = width/2*Math.sin(Math.tan(s.dydx));
                 r.acc = (r.vel - rg.get(i - 1).vel) / s.dt;
                 r.time = s.time;
                 r.dydx = s.dydx;
@@ -326,7 +394,6 @@ public final class ContinuousPath {
      * @param s segment to calculate
      * @return radius (in feet)
      */
-    
     private double radiusOfCurvature(Segment s) {
         //formula off the interent.
         double b, c, r;

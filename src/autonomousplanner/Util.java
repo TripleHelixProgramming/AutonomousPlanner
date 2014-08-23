@@ -19,6 +19,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 
 /**
  * A few useful methods.
@@ -209,32 +215,32 @@ public class Util {
         return new String(data, Charset.defaultCharset());
     }
 
-//        /**
-//     * Method from 2014 data viewer.
-//     *
-//     * @param x
-//     * @param y
-//     * @param name
-//     * @param yaxis
-//     */
-//    public static void makeGraph(SegmentGroup group, String name, String yaxis) {
-//        XYSeriesCollection collection = new XYSeriesCollection();
-//        XYSeries series = new XYSeries(name);
-//
-//        //make sure the lists are the same size/from same path
-//        //add to series
-//        for (int i = 0; i < group.s.size() - 1; i++) {
-//            series.add(group.s.get(i).x, group.s.get(i).y);
-//        }
-//        //add series to collection
-//        collection.addSeries(series);
-//
-//        //graph and make window
-//        JFreeChart chart = ChartFactory.createScatterPlot(name, "X", yaxis,
-//                collection, PlotOrientation.VERTICAL, true, true, false);
-//        ChartFrame frame = new ChartFrame(name, chart);
-//        frame.pack();
-//        frame.setVisible(true);
-//
-//    }
+        /**
+     * Method from 2014 data viewer.
+     *
+     * @param x
+     * @param y
+     * @param name
+     * @param yaxis
+     */
+    public static void makeGraph(SegmentGroup group, String name, String yaxis) {
+        XYSeriesCollection collection = new XYSeriesCollection();
+        XYSeries series = new XYSeries(name);
+
+        //make sure the lists are the same size/from same path
+        //add to series
+        for (int i = 0; i < group.s.size() - 1; i++) {
+            series.add(group.s.get(i).time, group.s.get(i).vel);
+        }
+        //add series to collection
+        collection.addSeries(series);
+
+        //graph and make window
+        JFreeChart chart = ChartFactory.createScatterPlot(name, "X", yaxis,
+                collection, PlotOrientation.VERTICAL, true, true, false);
+        ChartFrame frame = new ChartFrame(name, chart);
+        frame.pack();
+        frame.setVisible(true);
+
+    }
 }
