@@ -1,6 +1,7 @@
 package autonomousplanner;
 
 import autonomousplanner.IO.IO;
+import autonomousplanner.geometry.Line;
 import autonomousplanner.geometry.Segment;
 import autonomousplanner.geometry.SegmentGroup;
 import java.io.File;
@@ -49,7 +50,7 @@ public final class ContinuousPath {
             max_dcc = 10;
             width = 2;
             max_vel = 10;
-            max_jerk = 20; //is this okay?
+            max_jerk = 200; //is this okay?
             print("Input format error.  Using default robot values");
         }
         print(" ");
@@ -66,8 +67,8 @@ public final class ContinuousPath {
         calculateVelocity();
         //doJerkStuff();
         splitGroupByTime();
-        //recalculateValues();
-        //splitLeftRight();
+        recalculateValues();
+        splitLeftRight();
         print("ROBOT CALCULATE TIME: " + (System.currentTimeMillis() - start));
 
     }
@@ -163,7 +164,7 @@ public final class ContinuousPath {
             double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), p.get(i).vel);
             p.get(i).vel = v;
         }
-        
+
         for (int i = 1; i < p.size(); i++) {
             double v = p.get(i).vel;
             double dx = p.get(i - 1).dx;
@@ -171,94 +172,98 @@ public final class ContinuousPath {
             time = time + (2 * dx) / (v + v_0);
             time = (Double.isNaN(time)) ? 0 : time;
             p.get(i).time = time;
-            
+
         }
         //get rid of no dt segs
-        for(int i = 1; i < p.size(); i++){
-            double dt = p.get(i).time - p.get(i-1).time;
-            if(dt == 0 || Double.isInfinite(dt)){
+        for (int i = 1; i < p.size(); i++) {
+            double dt = p.get(i).time - p.get(i - 1).time;
+            if (dt == 0 || Double.isInfinite(dt)) {
                 p.remove(i);
             }
         }
         //reference calc of acc.
-        for(int i = 1; i <p.size(); i++){
-            double dv = p.get(i).vel - p.get(i-1).vel;
-            double dt = p.get(i).time - p.get(i-1).time;
-            if(dt == 0){
+        for (int i = 1; i < p.size(); i++) {
+            double dv = p.get(i).vel - p.get(i - 1).vel;
+            double dt = p.get(i).time - p.get(i - 1).time;
+            if (dt == 0) {
                 p.get(i).acc = 0;
-            }else{
-                p.get(i).acc = dv/dt;
+            } else {
+                p.get(i).acc = dv / dt;
             }
         }
-        Util.makeGraph(pathSegments, "test", "tet");
+        //Util.makeGraph(pathSegments, "Step 1", "acceleration");
+        //Util.makeGraph(pathSegments, "test", "tet");
     }
 
     public void doJerkStuff() {
         double time = 0;
-//        //calculate acceleration
+        //calculate acceleration
         ArrayList<Segment> p = pathSegments.s;
-        for (int i = 1; i < p.size(); i++) {
-            double dv = p.get(i).vel - p.get(i - 1).vel;
-            double dt = p.get(i).time - p.get(i - 1).vel;
-            p.get(i).acc = dv / dt;
-        }
+//        for (int i = 1; i < p.size(); i++) {
+//            double dv = p.get(i).vel - p.get(i - 1).vel;
+//            double dt = p.get(i).time - p.get(i - 1).vel;
+//            p.get(i).acc = dv / dt;
+//        }
         //peform Jared Russell's method on acc/position curve.
-//        for (int i = 1; i < p.size(); i++) {
-//            double a_0 = p.get(i - 1).acc;
-//            double dx = p.get(i - 1).dx;
-//            if (dx != 0) {
-//                double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
-//                double a = Math.min(a_max, p.get(i).acc);
-//                if (Double.isNaN(a)) {
-//                    a = 0;
-//                }
-//                p.get(i).acc = a;
-//            } else {
-//                p.get(i).acc = 0;
-//            }
-//        }
+        for (int i = 1; i < p.size(); i++) {
+            double a_0 = p.get(i - 1).acc;
+            double dx = p.get(i - 1).dx;
+            if (dx != 0) {
+                double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
+                double a = Math.min(a_max, p.get(i).acc);
+                if (Double.isNaN(a)) {
+                    a = 0;
+                }
+                p.get(i).acc = a;
+            } else {
+                p.get(i).acc = 0;
+            }
+        }
 
-//        for (int i = p.size() - 2; i > 1; i--) {
-//            double a_0 = p.get(i + 1).acc;
-//            double dx = p.get(i + 1).dx;
-//            double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
-//            double a = Math.min((Double.isNaN(a_max) ? max_acc : a_max), p.get(i).acc);
-//            p.get(i).acc = a;
-//        }
-//        //recalculate velocity, using only dx and acceleration, as velocity
-//        //is max velocity with acc. limits, and may not always be achieved
-//        //with jerk limits in place.
-//        p.get(0).vel = 0;
-//        for (int i = 1; i < p.size(); i++) {
-//            double v_0 = p.get(i - 1).vel;
-//            double dx = p.get(i).posit - p.get(i - 1).posit;
-//            double a = (p.get(i).acc + p.get(i - 1).acc) / 2;
-//            a = (Double.isNaN(a)) ? 0 : a;
-//            double v_f = Math.sqrt(Math.abs(v_0 * v_0 + 2 * a * dx));
-//            p.get(i).vel = v_f;
-//            //System.out.println(v_f);
-//        }
+        for (int i = p.size() - 2; i > 1; i--) {
+            double a_0 = p.get(i + 1).acc;
+            double dx = p.get(i + 1).dx;
+            double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
+            double a = Math.min((Double.isNaN(a_max) ? max_acc : a_max), p.get(i).acc);
+            p.get(i).acc = a;
+        }
+        //recalculate velocity, using only dx and acceleration, as velocity
+        //is max velocity with acc. limits, and may not always be achieved
+        //with jerk limits in place.
+        p.get(0).vel = 0;
+        for (int i = 1; i < p.size(); i++) {
+            double v_0 = p.get(i - 1).vel;
+            double dx = p.get(i).posit - p.get(i - 1).posit;
+            double a = (p.get(i).acc + p.get(i - 1).acc) / 2;
+            a = (Double.isNaN(a)) ? 0 : a;
+            double v_f = Math.sqrt(Math.abs(v_0 * v_0 + 2 * a * dx));
+            p.get(i).vel = v_f;
+            //System.out.println(v_f);
+        }
         //recalculate time
-//        for (int i = 1; i < p.size(); i++) {
-//            double v = p.get(i).vel;
-//            double dx = p.get(i - 1).dx;
-//            double v_0 = p.get(i - 1).vel;
-//            time = time + (2 * dx) / (v + v_0);
-//            time = (Double.isNaN(time)) ? 0 : time;
-//            p.get(i).time = time;
-//            //System.out.println(time);
-//        }
+        for (int i = 1; i < p.size(); i++) {
+            double v = p.get(i).vel;
+            double dx = p.get(i - 1).dx;
+            double v_0 = p.get(i - 1).vel;
+            time = time + (2 * dx) / (v + v_0);
+            time = (Double.isNaN(time)) ? 0 : time;
+            p.get(i).time = time;
+            //System.out.println(time);
+        }
+        //Util.makeGraph(pathSegments, "test", "tet");
     }
 
     /**
      * Splits the segment group up into equally timed segments.
      */
     private void splitGroupByTime() {
+        
         print("     Time dividing segments.");
         int segNum = 0; //the current time segment
         int numSeg = 0; //number of time segments
         int numMessySeg = 0; //number of segments that need to be interpolated
         double timeSoFar = 0; //time elapsed so far
+        int startSegment = 0, endSegment = 0;
         for (int i = 0; i < pathSegments.s.size(); i++) {
             //at the start, make a new segment, time = 0
             if (i == 0) {
@@ -279,18 +284,22 @@ public final class ContinuousPath {
                 timeSegments.s.get(timeSegments.s.size() - 1).dt = newDT;
                 //timeSegments.s.get(timeSegments.s.size() - 1).jerk = pathSegments.s.get(i).jerk;
                 //find out if we have a messy segment
-                if (Math.abs(pathSegments.s.get(i).time - segmentTime(segNum)) > 0.0105) {
+                if (Math.abs(pathSegments.s.get(i).time - segmentTime(segNum)) > 0.01005) {
                     numMessySeg++;
                 }
                 segNum++;
             }
         }
-        print("     Divided into " + numSeg + " segments, with a total of "
-                + numMessySeg + " interpolated segments.");
+        print("     Time dividing segments.");
+        //double segNum = 0;
+        //follow the path.
+
+        print("     Divided into " + segNum + " segments, with " + numMessySeg + " messy segments.");
         print("   STATISTICS:");
         print("     Time: " + timeSegments.s.get(timeSegments.s.size() - 1).time);
         print("     Distance: " + timeSegments.s.get(timeSegments.s.size() - 1).posit);
         print("     Average Speed: " + (timeSegments.s.get(timeSegments.s.size() - 1).posit / timeSegments.s.get(timeSegments.s.size() - 1).time));
+        //Util.makeGraph(timeSegments, "Step 1", "acceleration");
     }
 
     /**

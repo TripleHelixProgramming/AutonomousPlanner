@@ -114,7 +114,7 @@ public class Util {
 
     /**
      * Create a segment group from a string of data. 
-     * Based off 254's version.
+     * Based off of 254's version.
      * @param in
      * @return
      */
@@ -230,7 +230,7 @@ public class Util {
         //make sure the lists are the same size/from same path
         //add to series
         for (int i = 0; i < group.s.size() - 1; i++) {
-            series.add(group.s.get(i).time, group.s.get(i).vel);
+            series.add(group.s.get(i).time, group.s.get(i).acc);
         }
         //add series to collection
         collection.addSeries(series);

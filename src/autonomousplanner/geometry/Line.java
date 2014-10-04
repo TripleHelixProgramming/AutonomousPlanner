@@ -97,6 +97,20 @@ public class Line implements Spline {
             sg.add(s);
         }
     }
+    
+    /**
+     * Evaluate the line at a point.  Can be between the original endpoints,
+     * or outside them.
+     * @param x The x value to evaluate at.
+     * @return The y value.
+     */
+    public double evaluateAt(double x){
+        double dy = y2 - y1;
+        double dx = x2 - x1;
+        dydx = dy/dx;
+        double b = y2 - (dydx * x2);
+        return dydx * x + b;
+    }
 
     /**
      * Length of spline in segments

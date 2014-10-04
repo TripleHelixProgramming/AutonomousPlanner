@@ -43,7 +43,7 @@ public class AutonomousMode extends TimerTask {
     int currentID = 0;
 
     int LOW_RES = 100;
-    int HIGH_RES = 10000;
+    int HIGH_RES = 200_000;
 
     /**
      * Make new auto mode.
@@ -196,7 +196,8 @@ public class AutonomousMode extends TimerTask {
 
         @Override
         public void mouseClicked(MouseEvent me) {
-
+            //not used!
+            
         }
 
         /**

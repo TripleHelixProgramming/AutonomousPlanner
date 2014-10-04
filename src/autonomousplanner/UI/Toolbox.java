@@ -49,7 +49,7 @@ public class Toolbox extends javax.swing.JFrame {
         setTitle("Toolbox");
         setAlwaysOnTop(true);
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Line", "Piecewise Cubic", "Quintic", "Parametric Quintic" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Parametric Quintic", "Line", "Piecewise Cubic", "Quintic" }));
 
         jLabel1.setText("Type");
 
@@ -117,7 +117,7 @@ public class Toolbox extends javax.swing.JFrame {
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jButton7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
