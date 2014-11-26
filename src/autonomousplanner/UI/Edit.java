@@ -1,3 +1,4 @@
+
 package autonomousplanner.UI;
 
 import autonomousplanner.Util;
@@ -26,12 +27,10 @@ import javax.swing.JOptionPane;
 import javax.swing.event.MouseInputListener;
 
 /**
- * An auto mode and its spline editor window
- *
+ * A superior Spline Editor.
  * @author Jared
  */
-public class AutonomousMode extends TimerTask {
-
+public class Edit extends TimerTask{
     Point startPoint;
     Timer timer = new Timer();
     Editor display;
@@ -53,7 +52,7 @@ public class AutonomousMode extends TimerTask {
      * @param h start heading (radians pls)
      * @param name name of auto mode.
      */
-    public AutonomousMode(double x, double y, double h, String name) {
+    public Edit(double x, double y, double h, String name) {
         startX = x;
         startY = y;
         startH = h;
@@ -737,6 +736,4 @@ public class AutonomousMode extends TimerTask {
         display.repaint();
     }
     
-  
-
 }

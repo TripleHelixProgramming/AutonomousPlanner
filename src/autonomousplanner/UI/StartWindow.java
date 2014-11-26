@@ -14,7 +14,7 @@ import javax.swing.UnsupportedLookAndFeelException;
  * @author Jared
  */
 public class StartWindow extends javax.swing.JFrame {
-    public AutonomousMode editor;
+    public Edit editor;
     /**
      * Creates new form StartWindow
      */
@@ -139,10 +139,10 @@ public class StartWindow extends javax.swing.JFrame {
     private void newAutonomous() {
         //set up editing environment.
         String name = Util.messageBoxString("Name of Autonomous", "New Auto");
-        Double x = Util.messageBoxDouble("Starting x value", "New Auto");
-        Double y = Util.messageBoxDouble("Starting y value", "New Auto");
-        Double h = Util.messageBoxDouble("Starting heading", "New Auto");
-         editor = new AutonomousMode(x, y, h, name);
+//        Double x = Util.messageBoxDouble("Starting x value", "New Auto");
+//        Double y = Util.messageBoxDouble("Starting y value", "New Auto");
+//        Double h = Util.messageBoxDouble("Starting heading", "New Auto");
+        editor = new Edit(0, 0, 0, name);
         Toolbox tb = new Toolbox(editor);
         tb.openWindow();
 
