@@ -91,5 +91,26 @@ ArrayList<Segment> p = pathSegments.s;
                 p.remove(i);
             }
         }
-        ```
+```
+Next, we throw away the majority of our data points, only picking the ones closest to each 0.01 second time interval.  This is why we had so much resolution in our path up to now.  The high resolution ensures that there will a point close to each of our time points, each spaced out every .01 seconds.  This method will detect if any individual point is off by more than 3%, and will attempt to interpolate a new data point closer to the correct time, but it has yet to pick up on any inaccuracy greater than 1%.
+
+We split by time so that the robot's path following thread, which runs every .01 seconds can just pull a new data point after each iteration without having to worry about additional timing issues.
+
+Next, the path is split into two separate paths, one for each side of the robot.  The user must enter the robot's width to get these paths in the right place.  Now that each path has new x and y locations, and first derivatives are recalculated.  Second derivatives are skipped because they were only needed for the radius of curvature calculation.  In addition, we also store the velocity/acceleration data for each point in each of the sides.  Note that these velocities/acceleratiosn will be different for each side.  In addition, distance travelled at each point is stored in the path array.  This helps the robot know if it's on path at any point in time by comparing actual and desired distance travelled, and can be used to compute the neccessary correction.
+
+Next, this data is loaded into a text file which can be FTP'd to the robot controller.
+
+On startup, the robot controller reads in the text file, and converts it back to a path object.  Java's StringTokenizer class is the coolest thing in the world.
+
+To follow the path, we use two feedforward terms, and three PID loops.  PID controllers are better described on Wikipedia 
+http://en.wikipedia.org/wiki/PID_controller
+
+The feedforward terms attempt to approximate the motor output power needed to stay on the path at all points in time.  It turns out there is a fairly linear relation between velocity and motor voltage and acceleration and motor voltage, so we can approximate our output with this function
+```
+output = (acc * K_a) + (vel * K_v);
+```
+Where ka and kv are two constants determined through testing that related desired velocity/accleration to motor voltage.  Two PID loops monitor the two side's distance travelled, measured with sensors installed in the robot's gearboxes, and correct the output power slightly to keep the actual distance traveled accurate.  A third PID loop compares actual robot heading to desired robot heading, and adjusts outputs to ensure the robot is always pointed in the right direction.
+
+
+
 
