@@ -9,3 +9,4 @@ This software has a graphical interface to drag and drop points on a robot's pat
 
 How it Works
 ============
+The program starts by generating all line paths.  Each path is an array of points, called PathSegments.  Each pathSegment contains x and y location and first and second derivatives of y with respect to x (used to calculate heading, and rate of change of heading with respect to distance traveled). To generate the polynomial functions for the curved section of the path, we interpolate two 5th degree polynomial functions, x(s) and y(s), where s is a parameter from 0 to 1 
