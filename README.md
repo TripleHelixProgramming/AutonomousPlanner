@@ -37,5 +37,59 @@ Next, we must tackle the problem of finding the robot's velocity at each point. 
 
 The third one is very important- a robot weighs 150 lbs, and can't take a right angle turn while traveling at 15 feet/second.  There is some math involved to compute the radius of curvature of the path and the speed of the outermost point on the robot (must be given the width of the robot first!), as well as some approximations for the robot's moment of inertia (how much torque is needed to get angular acceleration of the robot).
 
-After we have data that represents maximum velocities at each point, we must generate a robot velocity function that always remains below this maximum velocity fuction.  Also, the steepness of this curve, which is related to acceleration, must have limits, as we can only accelerate so quickly.  This gets more complicated, because our function is a veloctity position curve instead of a velocity time curve, so acceleration is not simply the slope of the graph.  Instead, a = (v_i^2 - v_f^2)/2*dx
+After we have data that represents maximum velocities at each point, we must generate a robot velocity function that always remains below this maximum velocity fuction.  Also, the steepness of this curve, which is related to acceleration, must have limits, as we can only accelerate so quickly.  This gets more complicated, because our function is a veloctity position curve instead of a velocity time curve, so acceleration is not simply the slope of the graph.  This math is explained in the code.  To generate the robot velocity curve, we first work from the start to the end, only paying attention to our maximum velocity and maximum acceleration, and we disregard maximum deceleration.  This result will have possible accelerations, but may have a deceleration that's too steep.  To correct this, we work from back to front with the same calculation, paying attention to acceleration in the back to front direction.  Finally, we compare the curves, and pick the lowest velocity between the two for each.  This likely doesn't make much sense without a diagram, but it does work quite well for producing a velocity/displacement curve with limited acceleration that's always lower than a second maximum velocity curve.
+
+Finally, we add the velocity data to the position curve from earlier, and calculate the overall time and the change in time between/at each point.
+
+```Java
+ArrayList<Segment> p = pathSegments.s;
+        for (int i = 1; i < p.size(); i++) {
+            if (p.get(i).dx == 0) {
+                p.remove(i);
+            }
+        }
+        p.get(0).vel = 0;
+        double time = 0;
+        for (int i = 1; i < p.size(); i++) {
+            //what is the maximum our v_f can be?
+            //sqrt(v_0^2 + 2*a_max*dx)
+            double v_0 = p.get(i - 1).vel;
+            double dx = p.get(i - 1).dx;
+            if (dx != 0) {
+                double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_acc * dx));
+                double v = Math.min(v_max, p.get(i).vel);
+                if (Double.isNaN(v)) {
+                    v = p.get(i - 1).vel;
+                }
+                p.get(i).vel = v;
+            } else {
+                p.get(i).vel = p.get(i - 1).vel;
+            }
+        }
+        p.get(p.size() - 1).vel = 0;
+        for (int i = p.size() - 2; i > 1; i--) {
+            double v_0 = p.get(i + 1).vel;
+            double dx = p.get(i + 1).dx;
+            double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_dcc * dx));
+            double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), p.get(i).vel);
+            p.get(i).vel = v;
+        }
+
+        for (int i = 1; i < p.size(); i++) {
+            double v = p.get(i).vel;
+            double dx = p.get(i - 1).dx;
+            double v_0 = p.get(i - 1).vel;
+            time = time + (2 * dx) / (v + v_0);
+            time = (Double.isNaN(time)) ? 0 : time;
+            p.get(i).time = time;
+
+        }
+        //get rid of no dt segs
+        for (int i = 1; i < p.size(); i++) {
+            double dt = p.get(i).time - p.get(i - 1).time;
+            if (dt == 0 || Double.isInfinite(dt)) {
+                p.remove(i);
+            }
+        }
+        ```
 
