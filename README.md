@@ -24,5 +24,27 @@ This paper outlines the approach I took, which used the quintic hermite basis fu
 http://www.math.ucla.edu/~baker/149.1.02w/handouts/dd_splines.pdf
 This paper is also very helpful.  It discusses how we must also pay attention to the second derivative when creating our paths.  A path may be smooth and first derivative continous, but still very difficult to drive, due to discontinuities in the second derivative.  Imagine driving a car, and having to immediately transition from a sharp left turn to a sharp right turn.  This happens if the second derivative of your path (meaning second derivative of y position with respect to x position) has jumps or discontinuities.   This paper also discusses the parametric/non-parametric difference nicely.
 
+##Finalizing Path
+This final computation begins by computing all segments in a very high resolution (roughly 15k points/foot of distance travelled).  This super-high resolution method is probably not the best way to solve this problem, but as you will see later, is required for one of my methods.  Even though there are many ponits, it easily runs this segment in less than 50ms, but uses a fair amount of RAM. 
 
+These points contain first derivatives at each point (can be used to find heading), but we must find the second derivative from the data.  
+
+```java
+ for (int i = 0; i < pathSegments.s.size(); i++) {
+            if (i == 0) {
+                pathSegments.s.get(i).d2ydx2 = 0;  //at the first point
+                //second derivative is zero.
+            } else {
+                double d1, d2;
+                d2 = pathSegments.s.get(i).dydx;
+                d1 = pathSegments.s.get(i - 1).dydx;
+                double t1, t2;
+                t2 = pathSegments.s.get(i).x;
+                t1 = pathSegments.s.get(i - 1).x;
+                //the change in the first derivative over the change in x
+                pathSegments.s.get(i).d2ydx2 = ((d2 - d1) / (t2 - t1));
+            }
+        }
+```
+Next, we must tackle the problem of finding the robot's velocity at each point.  Before we worry about acceleration limits, we must create a function that represents the maximum possible velocity at each point, given no restratints on acceleration.  There are three limits to velocity (excluding acceleration)
 
