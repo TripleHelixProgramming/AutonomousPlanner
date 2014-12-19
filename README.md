@@ -31,9 +31,9 @@ These points contain first derivatives at each point (can be used to find headin
 
 Next, we must tackle the problem of finding the robot's velocity at each point.  Before we worry about acceleration limits, we must create a function that represents the maximum possible velocity at each point, given no restratints on acceleration.  There are three limits to velocity (excluding acceleration)
 
--Maximum Velocity of the outside wheel in a turn
--Robot's maximum velocity
--Maximum  acceleration the drive motors can provide to change the direction of the robot's direction
+* Maximum Velocity of the outside wheel in a turn
+* Robot's maximum velocity
+* Maximum  acceleration the drive motors can provide to change the direction of the robot's direction
 
 The third one is very important- a robot weighs 150 lbs, and can't take a right angle turn while traveling at 15 feet/second.  There is some math involved to compute the radius of curvature of the path and the speed of the outermost point on the robot (must be given the width of the robot first!), as well as some approximations for the robot's moment of inertia (how much torque is needed to get angular acceleration of the robot).
 
