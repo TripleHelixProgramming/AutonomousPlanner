@@ -177,10 +177,10 @@ public class AutonomousMode extends TimerTask {
             for (int i = 0; i < splines.size(); i++) {
                 Spline sp = splines.get(i);
 
-                for (int j = 1; j < sp.getSegments().s.size() - 1; j++) {
+                for (int j = 1; j < sp.getSegments().size() - 1; j++) {
                     //look ahead line draw
-                    Segment s1 = sp.getSegments().s.get(j - 1);
-                    Segment s2 = sp.getSegments().s.get(j);
+                    Segment s1 = sp.getSegments().get(j - 1);
+                    Segment s2 = sp.getSegments().get(j);
                     g.drawLine((int) s1.x, (int) s1.y, (int) s2.x, (int) s2.y);
                 }
             }
@@ -188,13 +188,13 @@ public class AutonomousMode extends TimerTask {
             for (int i = 0; i < sGroups.size(); i++) {
                 SplineGroup sp = sGroups.get(i);
 
-                for (int j = 1; j < sp.getSegments().s.size(); j++) {
+                for (int j = 1; j < sp.getSegments().size(); j++) {
                     //look ahead line draw
-                    Segment s1 = sp.getSegments().s.get(j - 1);
-                    Segment s2 = sp.getSegments().s.get(j);
+                    Segment s1 = sp.getSegments().get(j - 1);
+                    Segment s2 = sp.getSegments().get(j);
                     g.drawLine((int) s1.x, (int) s1.y, (int) s2.x, (int) s2.y);
                 }
-                Segment max = sp.getSegments().s.get(sp.getSegments().s.size() - 1);
+                Segment max = sp.getSegments().get(sp.getSegments().size() - 1);
                 //g.drawRect((int)max.x, (int)max.y, 2, 2);
             }
         }
@@ -697,16 +697,16 @@ public class AutonomousMode extends TimerTask {
 
                 }
                 if (isGroup) {
-                    ArrayList<Segment> p = sGroup.getSegments().s;
-                    for (int k = 0; k < sGroup.getSegments().s.size(); k++) {
+                    SegmentGroup segmentsGroup= sGroup.getSegments();
+                    for (int k = 0; k < sGroup.getSegments().size(); k++) {
                         Segment seg = new Segment();
-                        seg.x = p.get(k).x;
-                        seg.y = p.get(k).y;
+                        seg.x = segmentsGroup.get(k).x;
+                        seg.y = segmentsGroup.get(k).y;
                         s.add(seg);
                     }
                 } else {
-                    ArrayList<Segment> p = spline.getSegments().s;
-                    System.out.println(spline.getSegments().s.size());
+                	SegmentGroup segmentsGroup= spline.getSegments();
+                    System.out.println(spline.getSegments().size());
 //                        for (int l = 0; l < spline.getSegments().s.size(); l++) {
 ////                            Segment seg = new Segment();
 ////                            seg.x = p.get(l).x;
@@ -715,10 +715,10 @@ public class AutonomousMode extends TimerTask {
 ////                            //System.out.println("t");
 ////                             //System.out.println(spline.getSegments().s.size() + " size");
 //                        }    
-                    for(int turd = p.size()-1; turd > -1; turd--){
+                    for(int turd = segmentsGroup.size()-1; turd > -1; turd--){
                         Segment seg = new Segment();
-                           seg.x = p.get(turd).x;
-                           seg.y = p.get(turd).y;
+                           seg.x = segmentsGroup.get(turd).x;
+                           seg.y = segmentsGroup.get(turd).y;
                            s.add(seg);
                     }
                 }

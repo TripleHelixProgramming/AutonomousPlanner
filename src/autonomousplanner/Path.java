@@ -80,9 +80,9 @@ public class Path {
      * Generate lists needed for path math.
      */
     public void makeScaledLists(){
-        for(int i = 0; i < inGroup.s.size(); i++){
-            x.add((inGroup.s.get(i).x-250)/20);
-            y.add((inGroup.s.get(i).y-250)/20);
+        for(int i = 0; i < inGroup.size(); i++){
+            x.add((inGroup.get(i).x-250)/20);
+            y.add((inGroup.get(i).y-250)/20);
         }
     }
     
@@ -138,13 +138,13 @@ public class Path {
             seg.posit = l.get((int) s);
             seg.dydx = derivative((int) s, (int) s2);
             if(i!=0){
-                            seg.dx = seg.posit - group.s.get(group.s.size()-1).posit;
+                            seg.dx = seg.posit - group.get(group.size()-1).posit;
 
             }
             
-            group.s.add(seg);
+            group.add(seg);
         }
-        print("     Created " + group.s.size() + " segments. "
+        print("     Created " + group.size() + " segments. "
                 + "Time: " + (System.currentTimeMillis() - start));
         
         

@@ -29,21 +29,21 @@ public class P_LoopFollower extends TimerTask {
     public void run() {
         if (isRunning) {
 
-            Segment l = rsg.left.s.get(i);
-            Segment r = rsg.right.s.get(i);
+            Segment l = rsg.left.get(i);
+            Segment r = rsg.right.get(i);
 
             double lBase = (l.vel * kV + l.acc * kAcc);
             double rBase = (r.vel * kV + r.acc * kAcc);
 
             double lAdjust = (out.getLeftDistance() - l.posit) * kP_distance +
-                    (out.getHeading() - rsg.robot.s.get(i).h) * kP_heading;
+                    (out.getHeading() - rsg.robot.get(i).h) * kP_heading;
             double rAdjust = (out.getRightDistance() - r.posit) * kP_distance - 
-                    (out.getHeading() - rsg.robot.s.get(i).h) * kP_heading;
+                    (out.getHeading() - rsg.robot.get(i).h) * kP_heading;
             out.setLeftPower(lBase + lAdjust);
             out.setRightPower(rBase + rAdjust);
             i++;
         }
-        if (i == rsg.left.s.size()) {
+        if (i == rsg.left.size()) {
             i = 0;
             isRunning = false; //reset and stop at end.
         }

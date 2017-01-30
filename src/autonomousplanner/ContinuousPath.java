@@ -1,7 +1,6 @@
 package autonomousplanner;
 
 import autonomousplanner.IO.IO;
-import autonomousplanner.geometry.Line;
 import autonomousplanner.geometry.Segment;
 import autonomousplanner.geometry.SegmentGroup;
 import java.io.File;
@@ -78,20 +77,20 @@ public final class ContinuousPath {
      * dp/dt.
      */
     private void computeSecondDerivative() {
-        print("     Finding Second Derivative of " + pathSegments.s.size() + " segments");
-        for (int i = 0; i < pathSegments.s.size(); i++) {
+        print("     Finding Second Derivative of " + pathSegments.size() + " segments");
+        for (int i = 0; i < pathSegments.size(); i++) {
             if (i == 0) {
-                pathSegments.s.get(i).d2ydx2 = 0;  //at the first point
+                pathSegments.get(i).d2ydx2 = 0;  //at the first point
                 //second derivative is zero.
             } else {
                 double d1, d2;
-                d2 = pathSegments.s.get(i).dydx;
-                d1 = pathSegments.s.get(i - 1).dydx;
+                d2 = pathSegments.get(i).dydx;
+                d1 = pathSegments.get(i - 1).dydx;
                 double t1, t2;
-                t2 = pathSegments.s.get(i).x;
-                t1 = pathSegments.s.get(i - 1).x;
+                t2 = pathSegments.get(i).x;
+                t1 = pathSegments.get(i - 1).x;
                 //the change in the first derivative over the change in x
-                pathSegments.s.get(i).d2ydx2 = ((d2 - d1) / (t2 - t1));
+                pathSegments.get(i).d2ydx2 = ((d2 - d1) / (t2 - t1));
 
             }
         }
@@ -105,12 +104,12 @@ public final class ContinuousPath {
         print("     Calculating Maximum Possible Velocity");
         //a = v^2/r
         //sqrt(ar) = v
-        for (int i = 0; i < path.group.s.size(); i++) {
-            double r = radiusOfCurvature(pathSegments.s.get(i));
+        for (int i = 0; i < path.group.size(); i++) {
+            double r = radiusOfCurvature(pathSegments.get(i));
             double v_max_curve = Math.sqrt(max_acc * r);
             double big_r = r + width / 2;
             double v_max_wheel = (r / big_r) * max_vel;
-            pathSegments.s.get(i).vel = Math.min(v_max_curve, Math.min(v_max_wheel, max_vel));
+            pathSegments.get(i).vel = Math.min(v_max_curve, Math.min(v_max_wheel, max_vel));
         }
 
     }
@@ -132,63 +131,62 @@ public final class ContinuousPath {
      * acceleration, and velocity limits.
      */
     public void calculateVelocity() {
-        ArrayList<Segment> p = pathSegments.s;
-        for (int i = 1; i < p.size(); i++) {
-            if (p.get(i).dx == 0) {
-                p.remove(i);
+        for (int i = 1; i < pathSegments.size(); i++) {
+            if (pathSegments.get(i).dx == 0) {
+            	pathSegments.remove(i);
             }
         }
-        p.get(0).vel = 0;
+        pathSegments.get(0).vel = 0;
         double time = 0;
-        for (int i = 1; i < p.size(); i++) {
+        for (int i = 1; i < pathSegments.size(); i++) {
             //what is the maximum our v_f can be?
             //sqrt(v_0^2 + 2*a_max*dx)
-            double v_0 = p.get(i - 1).vel;
-            double dx = p.get(i - 1).dx;
+            double v_0 = pathSegments.get(i - 1).vel;
+            double dx = pathSegments.get(i - 1).dx;
             if (dx != 0) {
                 double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_acc * dx));
-                double v = Math.min(v_max, p.get(i).vel);
+                double v = Math.min(v_max, pathSegments.get(i).vel);
                 if (Double.isNaN(v)) {
-                    v = p.get(i - 1).vel;
+                    v = pathSegments.get(i - 1).vel;
                 }
-                p.get(i).vel = v;
+                pathSegments.get(i).vel = v;
             } else {
-                p.get(i).vel = p.get(i - 1).vel;
+            	pathSegments.get(i).vel = pathSegments.get(i - 1).vel;
             }
         }
-        p.get(p.size() - 1).vel = 0;
-        for (int i = p.size() - 2; i > 1; i--) {
-            double v_0 = p.get(i + 1).vel;
-            double dx = p.get(i + 1).dx;
+        pathSegments.get(pathSegments.size() - 1).vel = 0;
+        for (int i = pathSegments.size() - 2; i > 1; i--) {
+            double v_0 = pathSegments.get(i + 1).vel;
+            double dx = pathSegments.get(i + 1).dx;
             double v_max = Math.sqrt(Math.abs(v_0 * v_0 + 2 * max_dcc * dx));
-            double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), p.get(i).vel);
-            p.get(i).vel = v;
+            double v = Math.min((Double.isNaN(v_max) ? max_vel : v_max), pathSegments.get(i).vel);
+            pathSegments.get(i).vel = v;
         }
 
-        for (int i = 1; i < p.size(); i++) {
-            double v = p.get(i).vel;
-            double dx = p.get(i - 1).dx;
-            double v_0 = p.get(i - 1).vel;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double v = pathSegments.get(i).vel;
+            double dx = pathSegments.get(i - 1).dx;
+            double v_0 = pathSegments.get(i - 1).vel;
             time = time + (2 * dx) / (v + v_0);
             time = (Double.isNaN(time)) ? 0 : time;
-            p.get(i).time = time;
+            pathSegments.get(i).time = time;
 
         }
         //get rid of no dt segs
-        for (int i = 1; i < p.size(); i++) {
-            double dt = p.get(i).time - p.get(i - 1).time;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double dt = pathSegments.get(i).time - pathSegments.get(i - 1).time;
             if (dt == 0 || Double.isInfinite(dt)) {
-                p.remove(i);
+            	pathSegments.remove(i);
             }
         }
         //reference calc of acc.
-        for (int i = 1; i < p.size(); i++) {
-            double dv = p.get(i).vel - p.get(i - 1).vel;
-            double dt = p.get(i).time - p.get(i - 1).time;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double dv = pathSegments.get(i).vel - pathSegments.get(i - 1).vel;
+            double dt = pathSegments.get(i).time - pathSegments.get(i - 1).time;
             if (dt == 0) {
-                p.get(i).acc = 0;
+            	pathSegments.get(i).acc = 0;
             } else {
-                p.get(i).acc = dv / dt;
+            	pathSegments.get(i).acc = dv / dt;
             }
         }
         //Util.makeGraph(pathSegments, "Step 1", "acceleration");
@@ -198,56 +196,50 @@ public final class ContinuousPath {
     public void doJerkStuff() {
         double time = 0;
         //calculate acceleration
-        ArrayList<Segment> p = pathSegments.s;
-//        for (int i = 1; i < p.size(); i++) {
-//            double dv = p.get(i).vel - p.get(i - 1).vel;
-//            double dt = p.get(i).time - p.get(i - 1).vel;
-//            p.get(i).acc = dv / dt;
-//        }
         //peform Jared Russell's method on acc/position curve.
-        for (int i = 1; i < p.size(); i++) {
-            double a_0 = p.get(i - 1).acc;
-            double dx = p.get(i - 1).dx;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double a_0 = pathSegments.get(i - 1).acc;
+            double dx = pathSegments.get(i - 1).dx;
             if (dx != 0) {
                 double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
-                double a = Math.min(a_max, p.get(i).acc);
+                double a = Math.min(a_max, pathSegments.get(i).acc);
                 if (Double.isNaN(a)) {
                     a = 0;
                 }
-                p.get(i).acc = a;
+                pathSegments.get(i).acc = a;
             } else {
-                p.get(i).acc = 0;
+                pathSegments.get(i).acc = 0;
             }
         }
 
-        for (int i = p.size() - 2; i > 1; i--) {
-            double a_0 = p.get(i + 1).acc;
-            double dx = p.get(i + 1).dx;
+        for (int i = pathSegments.size() - 2; i > 1; i--) {
+            double a_0 = pathSegments.get(i + 1).acc;
+            double dx = pathSegments.get(i + 1).dx;
             double a_max = Math.sqrt(Math.abs(a_0 * a_0 + 2 * max_jerk * dx));
-            double a = Math.min((Double.isNaN(a_max) ? max_acc : a_max), p.get(i).acc);
-            p.get(i).acc = a;
+            double a = Math.min((Double.isNaN(a_max) ? max_acc : a_max), pathSegments.get(i).acc);
+            pathSegments.get(i).acc = a;
         }
         //recalculate velocity, using only dx and acceleration, as velocity
         //is max velocity with acc. limits, and may not always be achieved
         //with jerk limits in place.
-        p.get(0).vel = 0;
-        for (int i = 1; i < p.size(); i++) {
-            double v_0 = p.get(i - 1).vel;
-            double dx = p.get(i).posit - p.get(i - 1).posit;
-            double a = (p.get(i).acc + p.get(i - 1).acc) / 2;
+        pathSegments.get(0).vel = 0;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double v_0 = pathSegments.get(i - 1).vel;
+            double dx = pathSegments.get(i).posit - pathSegments.get(i - 1).posit;
+            double a = (pathSegments.get(i).acc + pathSegments.get(i - 1).acc) / 2;
             a = (Double.isNaN(a)) ? 0 : a;
             double v_f = Math.sqrt(Math.abs(v_0 * v_0 + 2 * a * dx));
-            p.get(i).vel = v_f;
+            pathSegments.get(i).vel = v_f;
             //System.out.println(v_f);
         }
         //recalculate time
-        for (int i = 1; i < p.size(); i++) {
-            double v = p.get(i).vel;
-            double dx = p.get(i - 1).dx;
-            double v_0 = p.get(i - 1).vel;
+        for (int i = 1; i < pathSegments.size(); i++) {
+            double v = pathSegments.get(i).vel;
+            double dx = pathSegments.get(i - 1).dx;
+            double v_0 = pathSegments.get(i - 1).vel;
             time = time + (2 * dx) / (v + v_0);
             time = (Double.isNaN(time)) ? 0 : time;
-            p.get(i).time = time;
+            pathSegments.get(i).time = time;
             //System.out.println(time);
         }
         //Util.makeGraph(pathSegments, "test", "tet");
@@ -260,31 +252,27 @@ public final class ContinuousPath {
         
         print("     Time dividing segments.");
         int segNum = 0; //the current time segment
-        int numSeg = 0; //number of time segments
         int numMessySeg = 0; //number of segments that need to be interpolated
-        double timeSoFar = 0; //time elapsed so far
-        int startSegment = 0, endSegment = 0;
-        for (int i = 0; i < pathSegments.s.size(); i++) {
+        for (int i = 0; i < pathSegments.size(); i++) {
             //at the start, make a new segment, time = 0
             if (i == 0) {
-                timeSegments.s.add(pathSegments.s.get(0));
+                timeSegments.add(pathSegments.get(0));
                 segNum++; //move to the next segment
             }
             //after iterating, we've gone far enough to make another time segment
-            if (pathSegments.s.get(i).time > segmentTime(segNum)) {
-                numSeg++; //increment number of segments
-                timeSegments.s.add(pathSegments.s.get(i)); //add the existing segment
+            if (pathSegments.get(i).time > segmentTime(segNum)) {
+                timeSegments.add(pathSegments.get(i)); //add the existing segment
                 //as a new time segment
                 //dt will need to be updated
                 //look at the last and second to last time segments to 
                 //compute dt
-                double newDT = timeSegments.s.get(timeSegments.s.size() - 1).time
-                        - timeSegments.s.get(timeSegments.s.size() - 2).time;
+                double newDT = timeSegments.get(timeSegments.size() - 1).time
+                        - timeSegments.get(timeSegments.size() - 2).time;
                 //put dt in the time segment
-                timeSegments.s.get(timeSegments.s.size() - 1).dt = newDT;
+                timeSegments.get(timeSegments.size() - 1).dt = newDT;
                 //timeSegments.s.get(timeSegments.s.size() - 1).jerk = pathSegments.s.get(i).jerk;
                 //find out if we have a messy segment
-                if (Math.abs(pathSegments.s.get(i).time - segmentTime(segNum)) > 0.01005) {
+                if (Math.abs(pathSegments.get(i).time - segmentTime(segNum)) > 0.01005) {
                     numMessySeg++;
                 }
                 segNum++;
@@ -296,9 +284,9 @@ public final class ContinuousPath {
 
         print("     Divided into " + segNum + " segments, with " + numMessySeg + " messy segments.");
         print("   STATISTICS:");
-        print("     Time: " + timeSegments.s.get(timeSegments.s.size() - 1).time);
-        print("     Distance: " + timeSegments.s.get(timeSegments.s.size() - 1).posit);
-        print("     Average Speed: " + (timeSegments.s.get(timeSegments.s.size() - 1).posit / timeSegments.s.get(timeSegments.s.size() - 1).time));
+        print("     Time: " + timeSegments.get(timeSegments.size() - 1).time);
+        print("     Distance: " + timeSegments.get(timeSegments.size() - 1).posit);
+        print("     Average Speed: " + (timeSegments.get(timeSegments.size() - 1).posit / timeSegments.get(timeSegments.size() - 1).time));
         //Util.makeGraph(timeSegments, "Step 1", "acceleration");
     }
 
@@ -307,10 +295,10 @@ public final class ContinuousPath {
      */
     public void recalculateValues() {
         System.out.println("     Verifying values");
-        for (int i = 0; i < timeSegments.s.size(); i++) {
+        for (int i = 0; i < timeSegments.size(); i++) {
             if (i != 0) {
-                Segment now = timeSegments.s.get(i);
-                Segment past = timeSegments.s.get(i - 1);
+                Segment now = timeSegments.get(i);
+                Segment past = timeSegments.get(i - 1);
                 now.vel = (now.posit - past.posit) / (now.time - past.time);
                 now.acc = (now.vel - past.vel) / (now.time - past.time);
             }
@@ -325,43 +313,41 @@ public final class ContinuousPath {
      */
     public void splitLeftRight() {
         System.out.println("     Generating paths for robot sides");
-        for (int i = 0; i < timeSegments.s.size(); i++) {
+        for (int i = 0; i < timeSegments.size(); i++) {
             //left.
-            Segment s = timeSegments.s.get(i);
+            Segment s = timeSegments.get(i);
             Segment l = new Segment();
-            ArrayList<Segment> lg = left.s;
-            left.s.add(l);
-            l = left.s.get(i);
+            left.add(l);
+            l = left.get(i);
             l.x = s.x - width / 2 * Math.sin(Math.atan(s.dydx));
             l.y = s.y + width / 2 * Math.cos(Math.atan(s.dydx));
 
             if (i != 0) {
-                double dp = Math.sqrt((l.x - lg.get(i - 1).x)
-                        * (l.x - lg.get(i - 1).x)
-                        + (l.y - lg.get(i - 1).y)
-                        * (l.y - lg.get(i - 1).y));
-                l.posit = lg.get(i - 1).posit + dp;
+                double dp = Math.sqrt((l.x - left.get(i - 1).x)
+                        * (l.x - left.get(i - 1).x)
+                        + (l.y - left.get(i - 1).y)
+                        * (l.y - left.get(i - 1).y));
+                l.posit = left.get(i - 1).posit + dp;
                 l.vel = dp / s.dt;
-                l.acc = (l.vel - lg.get(i - 1).vel) / s.dt;
+                l.acc = (l.vel - left.get(i - 1).vel) / s.dt;
                 l.time = s.time;
                 l.dydx = s.dydx;
             }
 
             Segment r = new Segment();
-            ArrayList<Segment> rg = right.s;
-            right.s.add(r);
-            r = right.s.get(i);
+            right.add(r);
+            r = right.get(i);
             r.x = s.x + width / 2 * Math.sin(Math.atan(s.dydx));
             r.y = s.y - width / 2 * Math.cos(Math.atan(s.dydx));
 
             if (i != 0) {
-                double dp = Math.sqrt((r.x - rg.get(i - 1).x)
-                        * (r.x - rg.get(i - 1).x)
-                        + (r.y - rg.get(i - 1).y)
-                        * (r.y - rg.get(i - 1).y));
-                r.posit = rg.get(i - 1).posit + dp;
+                double dp = Math.sqrt((r.x - right.get(i - 1).x)
+                        * (r.x - right.get(i - 1).x)
+                        + (r.y - right.get(i - 1).y)
+                        * (r.y - right.get(i - 1).y));
+                r.posit = right.get(i - 1).posit + dp;
                 r.vel = dp / s.dt;
-                r.acc = (r.vel - rg.get(i - 1).vel) / s.dt;
+                r.acc = (r.vel - right.get(i - 1).vel) / s.dt;
                 r.time = s.time;
                 r.dydx = s.dydx;
             }
@@ -377,13 +363,20 @@ public final class ContinuousPath {
     public void savePath(File file) {
         long start = System.currentTimeMillis();
         print("Writing file...");
-        IO.writeFile(file, ("Potato" + '\n' + timeSegments.s.size() + '\n'
-                + timeSegments.toString()
-                + left.toString()
-                + right.toString()));
+        IO.writeFile(file, (getPathFileData()));
         print(
                 "Wrote file at " + file + " in "
                 + (System.currentTimeMillis() - start) + " ms");
+    }
+    
+    public String getPathFileData() {
+    	StringBuilder builder = new StringBuilder();
+    	for (int i = 0; i < timeSegments.size(); i++) {
+    		builder.append(timeSegments.get(i).time).append('\t')
+    		.append(left.get(i).vel).append('\t')
+    		.append(right.get(i).vel).append('\n');
+    	}
+    	return builder.toString();
     }
 
     /**
@@ -411,24 +404,6 @@ public final class ContinuousPath {
         r = b / Math.abs(s.d2ydx2);
         return r;
 
-    }
-
-    /**
-     * Makes a simple linear function to solve for all values of the segment at
-     * any point t within [a.time, b.time]. Not very useful for little gaps,
-     * useful for big jumps.
-     *
-     * Not implemented yet. I'll likely use Line.java, and add an evaluate at
-     * point method.
-     *
-     * @param a The segment before.
-     * @param b The segment after.
-     * @param t The t value in between the segments for the interpolated segment
-     * to have.
-     * @return
-     */
-    private Segment interpolateSegment(Segment a, Segment b, double t) {
-        return null;
     }
 
     /**

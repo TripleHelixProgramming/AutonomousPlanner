@@ -169,7 +169,7 @@ public class Quintic implements Spline {
     public synchronized void calculateSegments(int resolution) {
         distancep = resolution;
         getScaledPoints();
-        sg.s.clear();
+        sg.clear();
         
 
         for (int i = 0; i < xList.size(); i++) {
@@ -201,7 +201,7 @@ public class Quintic implements Spline {
      */
     @Override
     public void setExtremePoints(double x0, double y0, double x1, double y1) {
-        sg.s.clear();
+        sg.clear();
         xList.clear();
         yList.clear();
         editSpline(x0, y0, 0, x1, y1, 0);

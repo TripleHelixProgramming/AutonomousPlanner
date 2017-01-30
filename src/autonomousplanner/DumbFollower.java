@@ -27,13 +27,13 @@ public class DumbFollower extends TimerTask{
         
         //first we need to do some math to figure out a good approximation
         //of our output power
-        Segment l = rsg.left.s.get(i);
-        Segment r = rsg.right.s.get(i);
+        Segment l = rsg.left.get(i);
+        Segment r = rsg.right.get(i);
         
         out.setLeftPower(l.vel * kV + l.acc * kAcc);
         out.setRightPower(r.vel * kV + r.acc * kAcc);
         i++;
-        if(i == rsg.left.s.size()){
+        if(i == rsg.left.size()){
             i = 0; //restart, for now.
         }
     }

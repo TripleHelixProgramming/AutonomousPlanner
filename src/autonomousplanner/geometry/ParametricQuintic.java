@@ -76,17 +76,17 @@ public class ParametricQuintic implements Spline {
         xSegs = xt.getSegments();
         ySegs = yt.getSegments();
         if (!isFlipped) {
-            for (int i = 0; i < xSegs.s.size(); i++) {
+            for (int i = 0; i < xSegs.size(); i++) {
                 Segment out = new Segment();
-                out.x = xSegs.s.get(i).y; //not really y.  Just output
-                out.y = ySegs.s.get(i).y; //y this time.
+                out.x = xSegs.get(i).y; //not really y.  Just output
+                out.y = ySegs.get(i).y; //y this time.
                 output.add(out);
             }
         } else {
-            for (int i = xSegs.s.size() - 1; i > -1; i--) {
+            for (int i = xSegs.size() - 1; i > -1; i--) {
                 Segment out = new Segment();
-                out.x = xSegs.s.get(i).y; //not really y.  Just output
-                out.y = ySegs.s.get(i).y; //y this time.
+                out.x = xSegs.get(i).y; //not really y.  Just output
+                out.y = ySegs.get(i).y; //y this time.
                 output.add(out);
             }
         }

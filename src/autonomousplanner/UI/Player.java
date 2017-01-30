@@ -90,17 +90,17 @@ class Window extends JComponent {
      */
     public void showPath(Graphics g) {
 	//loop through segments, and plot x and y, scaled and centered.
-        for (int j = 0; j < s.s.size(); j++) {
-            g.drawRect((int) (s.s.get(j).x * 15 + k_left),
-                    (int) (s.s.get(j).y * 15 + (27 * 15)), 1, 1);
+        for (int j = 0; j < s.size(); j++) {
+            g.drawRect((int) (s.get(j).x * 15 + k_left),
+                    (int) (s.get(j).y * 15 + (27 * 15)), 1, 1);
         }
-        for (int j = 0; j < r.s.size(); j++) {
-            g.drawRect((int) (r.s.get(j).x * 15+ k_left),
-                    (int) (r.s.get(j).y * 15 + (27 * 15)), 1, 1);
+        for (int j = 0; j < r.size(); j++) {
+            g.drawRect((int) (r.get(j).x * 15+ k_left),
+                    (int) (r.get(j).y * 15 + (27 * 15)), 1, 1);
         }
-        for (int j = 0; j < l.s.size(); j++) {
-            g.drawRect((int) (l.s.get(j).x * 15+ k_left),
-                    (int) (l.s.get(j).y * 15 + (27 * 15)), 1, 1);
+        for (int j = 0; j < l.size(); j++) {
+            g.drawRect((int) (l.get(j).x * 15+ k_left),
+                    (int) (l.get(j).y * 15 + (27 * 15)), 1, 1);
         }
     }
     /**
@@ -115,24 +115,24 @@ class Window extends JComponent {
 			//draw the path
             showPath(g);
 			//get x, y, and theta values for this point in time
-            double x = s.s.get((int) i).x * 15;
-            double y = s.s.get((int) i).y * 15 + (27 * 15);
-            double theta = s.s.get((int) i).dydx;
+            double x = s.get((int) i).x * 15;
+            double y = s.get((int) i).y * 15 + (27 * 15);
+            double theta = s.get((int) i).dydx;
             theta = Math.atan(theta);
             
             g.drawRect(0, 0, 27 * 30, 27 * 30);
             
             g.drawChars("Velocity".toCharArray(), 0, 8, 40, 20);
-            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).vel)).toCharArray()), 0, 3, 40, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.get((int) i).vel)).toCharArray()), 0, 3, 40, 40);
 
             g.drawChars("Accel".toCharArray(), 0, 5, 100, 20);
-            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).acc)).toCharArray()), 0, 3, 100, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.get((int) i).acc)).toCharArray()), 0, 3, 100, 40);
 
             g.drawChars("Time".toCharArray(), 0, 4, 160, 20);
-            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).time)).toCharArray()), 0, 3, 160, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.get((int) i).time)).toCharArray()), 0, 3, 160, 40);
 
             g.drawChars("Distance".toCharArray(), 0, 8, 220, 20);
-            g.drawChars((String.valueOf(roundToHundreths(s.s.get((int) i).posit)).toCharArray()), 0, 3, 220, 40);
+            g.drawChars((String.valueOf(roundToHundreths(s.get((int) i).posit)).toCharArray()), 0, 3, 220, 40);
 
             //draw line that indicates heading
             g.drawLine((int) x+ k_left, (int) (y + (0)), (int) (100 * Math.cos(theta) + x)+ k_left, (int) (100 * Math.sin(theta) + y + (0)));
@@ -140,7 +140,7 @@ class Window extends JComponent {
 			//draw oval centered at x,y
             g.drawOval((int) x - 40+ k_left, (int) y - 40, 80, 80);
 			//get and scale velocity
-            double v = s.s.get((int) i).vel;
+            double v = s.get((int) i).vel;
             v *= 8;
 			//draw circle centered at x,y ,with diameter v
             g.drawOval((int) (x - v / 2)+ k_left, (int) (y - v / 2), (int) v, (int) v);
@@ -149,7 +149,7 @@ class Window extends JComponent {
             if(isAutomated){
             i += slider.getPlayRate();
 			//restart if needed.
-            if (i > s.s.size()- slider.getPlayRate()) {
+            if (i > s.size()- slider.getPlayRate()) {
                 i = 0;
             }
             }

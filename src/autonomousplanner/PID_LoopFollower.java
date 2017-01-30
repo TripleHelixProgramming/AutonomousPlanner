@@ -46,8 +46,8 @@ public class PID_LoopFollower extends TimerTask {
     public void run() {
         if (isRunning) {
             //our current segments to follow.
-            Segment l = rsg.left.s.get(i);
-            Segment r = rsg.right.s.get(i);
+            Segment l = rsg.left.get(i);
+            Segment r = rsg.right.get(i);
             
             //like a feed forward term, this calculates the values
             //if everything were perfect, and the PID calculated
@@ -57,7 +57,7 @@ public class PID_LoopFollower extends TimerTask {
             //update goals
             lPID.goal = l.posit;
             rPID.goal = r.posit;
-            hPID.goal = rsg.robot.s.get(i).h;
+            hPID.goal = rsg.robot.get(i).h;
             //calculate adjustments by updating the pid loop.
             double hAdjust = hPID.update(out.getHeading());
             double lAdjust = lPID.update(out.getLeftDistance());
@@ -67,7 +67,7 @@ public class PID_LoopFollower extends TimerTask {
             out.setRightPower(rBase + rAdjust - hAdjust);
             i++;
         }
-        if (i == rsg.left.s.size()) { //if we've gotten to the end...
+        if (i == rsg.left.size()) { //if we've gotten to the end...
             i = 0;
             isRunning = false; //reset and stop.
         }
